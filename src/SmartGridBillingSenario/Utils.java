@@ -6,7 +6,6 @@ import java.io.*;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.interfaces.RSAPublicKey;
-import java.security.spec.RSAPrivateCrtKeySpec;
 import java.security.spec.RSAPublicKeySpec;
 
 import static sun.security.x509.CertificateAlgorithmId.ALGORITHM;
@@ -60,13 +59,13 @@ public class Utils {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             BigInteger modulus = new BigInteger(1,
                     key);
-            RSAPrivateCrtKeySpec privateCrtKeySpec = new RSAPrivateCrtKeySpec()
+          //  RSAPrivateCrtKeySpec privateCrtKeySpec = new RSAPrivateCrtKeySpec()
             // get an RSA cipher object and print the provider
             final Cipher cipher = Cipher.getInstance(ALGORITHM);
 
             // decrypt the text using the private key
             // how to use given decrypt key??????
-            cipher.init(Cipher.DECRYPT_MODE, key);
+           // cipher.init(Cipher.DECRYPT_MODE, key);
             dectyptedText = cipher.doFinal(text);
 
         } catch (Exception ex) {

@@ -13,35 +13,22 @@ import tss.TpmStructurePrinter;
 /**
 * These are the RSA encryption schemes that only need a hash algorithm as a controlling parameter.
 */
-public class TPMS_ENC_SCHEME_OAEP extends TpmStructure implements TPMU_SCHEME_KEYEDHASH, TPMU_SIG_SCHEME, TPMU_KDF_SCHEME, TPMU_ASYM_SCHEME, TPMU_SIGNATURE
+public class TPMS_ENC_SCHEME_RSAES extends TpmStructure implements TPMU_ASYM_SCHEME
 {
     /**
     * These are the RSA encryption schemes that only need a hash algorithm as a controlling parameter.
-    * 
-    * @param _hashAlg the hash algorithm used to digest the message
     */
-    public TPMS_ENC_SCHEME_OAEP(TPM_ALG_ID _hashAlg)
+    public TPMS_ENC_SCHEME_RSAES()
     {
-        hashAlg = _hashAlg;
     }
-    /**
-    * These are the RSA encryption schemes that only need a hash algorithm as a controlling parameter.
-    */
-    public TPMS_ENC_SCHEME_OAEP() {};
-    /**
-    * the hash algorithm used to digest the message
-    */
-    public TPM_ALG_ID hashAlg;
     @Override
     public void toTpm(OutByteBuf buf)
     {
-        hashAlg.toTpm(buf);
         return;
     }
     @Override
     public void initFromTpm(InByteBuf buf)
     {
-        hashAlg = TPM_ALG_ID.fromTpm(buf);
     }
     @Override
     public byte[] toTpm() 
@@ -50,18 +37,18 @@ public class TPMS_ENC_SCHEME_OAEP extends TpmStructure implements TPMU_SCHEME_KE
         toTpm(buf);
         return buf.getBuf();
     }
-    public static TPMS_ENC_SCHEME_OAEP fromTpm (byte[] x)
+    public static TPMS_ENC_SCHEME_RSAES fromTpm (byte[] x)
     {
-        TPMS_ENC_SCHEME_OAEP ret = new TPMS_ENC_SCHEME_OAEP();
+        TPMS_ENC_SCHEME_RSAES ret = new TPMS_ENC_SCHEME_RSAES();
         InByteBuf buf = new InByteBuf(x);
         ret.initFromTpm(buf);
         if (buf.bytesRemaining()!=0)
             throw new AssertionError("bytes remaining in buffer after object was de-serialized");
         return ret;
     }
-    public static TPMS_ENC_SCHEME_OAEP fromTpm (InByteBuf buf)
+    public static TPMS_ENC_SCHEME_RSAES fromTpm (InByteBuf buf)
     {
-        TPMS_ENC_SCHEME_OAEP ret = new TPMS_ENC_SCHEME_OAEP();
+        TPMS_ENC_SCHEME_RSAES ret = new TPMS_ENC_SCHEME_RSAES();
         ret.initFromTpm(buf);
         return ret;
     }
@@ -69,7 +56,7 @@ public class TPMS_ENC_SCHEME_OAEP extends TpmStructure implements TPMU_SCHEME_KE
     @Override
     public String toString()
     {
-        TpmStructurePrinter _p = new TpmStructurePrinter("TPMS_ENC_SCHEME_OAEP");
+        TpmStructurePrinter _p = new TpmStructurePrinter("TPMS_ENC_SCHEME_RSAES");
         toStringInternal(_p, 1);
         _p.endStruct();
         return _p.toString();
@@ -78,7 +65,6 @@ public class TPMS_ENC_SCHEME_OAEP extends TpmStructure implements TPMU_SCHEME_KE
     @Override
     public void toStringInternal(TpmStructurePrinter _p, int d)
     {
-        _p.add(d, "TPM_ALG_ID", "hashAlg", hashAlg);
     };
     
     

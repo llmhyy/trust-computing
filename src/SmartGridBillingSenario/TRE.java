@@ -3,9 +3,11 @@ package SmartGridBillingSenario;
 import SmartGridBillingSenario.Socket.Message;
 import SmartGridBillingSenario.Socket.SocketServer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import tss.*;
+import tss.Helpers;
+import tss.Tpm;
+import tss.TpmFactory;
+import tss.Tss;
 import tss.tpm.*;
 
 import java.io.IOException;
@@ -54,7 +56,8 @@ public class TRE extends SocketServer{
         if (encrypteKey == null) {
             return null;
         } else {
-            Utils.decrypt(encrypteKey, privatePart);
+            String finalValue = Utils.decrypt(encrypteKey, privatePart);
+            return calculatePrice(finalValue);
         }
     }
 

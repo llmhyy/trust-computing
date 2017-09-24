@@ -6,10 +6,11 @@ import tss.*;
 // -----------This is an auto-generated file: do not edit
 
 //>>>
+
 /**
 * This structure describes the parameters that would appear in the public area of a KEYEDHASH object.
 */
-public class TPMS_KEYEDHASH_PARMS extends TpmStructure implements TPMU_PUBLIC_PARMS 
+public class TPMS_KEYEDHASH_PARMS extends TpmStructure implements TPMU_PUBLIC_PARMS
 {
     /**
     * This structure describes the parameters that would appear in the public area of a KEYEDHASH object.
@@ -40,7 +41,7 @@ public class TPMS_KEYEDHASH_PARMS extends TpmStructure implements TPMU_PUBLIC_PA
         throw new RuntimeException("Unrecognized type");
     }
     @Override
-    public void toTpm(OutByteBuf buf) 
+    public void toTpm(OutByteBuf buf)
     {
         buf.writeInt(GetUnionSelector_scheme(), 2);
         ((TpmMarshaller)scheme).toTpm(buf);
@@ -51,9 +52,9 @@ public class TPMS_KEYEDHASH_PARMS extends TpmStructure implements TPMU_PUBLIC_PA
     {
         int _schemeScheme = buf.readInt(2);
         scheme=null;
-        if(_schemeScheme==TPM_ALG_ID.HMAC.toInt()) {scheme = new TPMS_SCHEME_HMAC();}
-        else if(_schemeScheme==TPM_ALG_ID.XOR.toInt()) {scheme = new TPMS_SCHEME_XOR();}
-        else if(_schemeScheme==TPM_ALG_ID.NULL.toInt()) {scheme = new TPMS_NULL_SCHEME_KEYEDHASH();}
+        if(_schemeScheme== TPM_ALG_ID.HMAC.toInt()) {scheme = new TPMS_SCHEME_HMAC();}
+        else if(_schemeScheme== TPM_ALG_ID.XOR.toInt()) {scheme = new TPMS_SCHEME_XOR();}
+        else if(_schemeScheme== TPM_ALG_ID.NULL.toInt()) {scheme = new TPMS_NULL_SCHEME_KEYEDHASH();}
         if(scheme==null)throw new RuntimeException("Unexpected type selector");
         scheme.initFromTpm(buf);
     }
@@ -64,7 +65,7 @@ public class TPMS_KEYEDHASH_PARMS extends TpmStructure implements TPMU_PUBLIC_PA
         toTpm(buf);
         return buf.getBuf();
     }
-    public static TPMS_KEYEDHASH_PARMS fromTpm (byte[] x) 
+    public static TPMS_KEYEDHASH_PARMS fromTpm (byte[] x)
     {
         TPMS_KEYEDHASH_PARMS ret = new TPMS_KEYEDHASH_PARMS();
         InByteBuf buf = new InByteBuf(x);
@@ -73,7 +74,7 @@ public class TPMS_KEYEDHASH_PARMS extends TpmStructure implements TPMU_PUBLIC_PA
             throw new AssertionError("bytes remaining in buffer after object was de-serialized");
         return ret;
     }
-    public static TPMS_KEYEDHASH_PARMS fromTpm (InByteBuf buf) 
+    public static TPMS_KEYEDHASH_PARMS fromTpm (InByteBuf buf)
     {
         TPMS_KEYEDHASH_PARMS ret = new TPMS_KEYEDHASH_PARMS();
         ret.initFromTpm(buf);
