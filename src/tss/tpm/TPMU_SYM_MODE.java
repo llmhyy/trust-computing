@@ -1,11 +1,12 @@
 package tss.tpm;
 
-import tss.*;
+import tss.TpmMarshaller;
 
 
 // -----------This is an auto-generated file: do not edit
 
 //>>>
+
 /**
 * This is the union of all modes for all symmetric algorithms.
 */

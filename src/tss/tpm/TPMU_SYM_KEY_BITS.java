@@ -1,11 +1,12 @@
 package tss.tpm;
 
-import tss.*;
+import tss.TpmMarshaller;
 
 
 // -----------This is an auto-generated file: do not edit
 
 //>>>
+
 /**
 * This union is used to collect the symmetric encryption key sizes.
 */

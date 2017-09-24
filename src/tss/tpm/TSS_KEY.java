@@ -1,11 +1,15 @@
 package tss.tpm;
 
-import tss.*;
+import tss.InByteBuf;
+import tss.OutByteBuf;
+import tss.TpmStructure;
+import tss.TpmStructurePrinter;
 
 
 // -----------This is an auto-generated file: do not edit
 
 //>>>
+
 /**
 * Contains the public and private part of a TPM key
 */
@@ -17,7 +21,7 @@ public class TSS_KEY extends TpmStructure
     * @param _publicPart Public part of key 
     * @param _privatePart Private part is the encrypted sensitive part of key
     */
-    public TSS_KEY(TPMT_PUBLIC _publicPart,byte[] _privatePart)
+    public TSS_KEY(TPMT_PUBLIC _publicPart, byte[] _privatePart)
     {
         publicPart = _publicPart;
         privatePart = _privatePart;
@@ -36,7 +40,7 @@ public class TSS_KEY extends TpmStructure
     */
     public byte[] privatePart;
     @Override
-    public void toTpm(OutByteBuf buf) 
+    public void toTpm(OutByteBuf buf)
     {
         publicPart.toTpm(buf);
         buf.writeInt((privatePart!=null)?privatePart.length:0, 2);
@@ -58,7 +62,7 @@ public class TSS_KEY extends TpmStructure
         toTpm(buf);
         return buf.getBuf();
     }
-    public static TSS_KEY fromTpm (byte[] x) 
+    public static TSS_KEY fromTpm (byte[] x)
     {
         TSS_KEY ret = new TSS_KEY();
         InByteBuf buf = new InByteBuf(x);
@@ -67,7 +71,7 @@ public class TSS_KEY extends TpmStructure
             throw new AssertionError("bytes remaining in buffer after object was de-serialized");
         return ret;
     }
-    public static TSS_KEY fromTpm (InByteBuf buf) 
+    public static TSS_KEY fromTpm (InByteBuf buf)
     {
         TSS_KEY ret = new TSS_KEY();
         ret.initFromTpm(buf);
