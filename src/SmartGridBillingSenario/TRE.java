@@ -26,7 +26,7 @@ public class TRE {
         initTpm();
         ek = createEK();
         aik = createAik(ek);
-        TPM2B_PUBLIC_KEY_RSA ekPubKey = (TPM2B_PUBLIC_KEY_RSA) (ek.outPublic.unique);
+
 
     }
 
@@ -71,4 +71,6 @@ public class TRE {
         return Tss.createActivationCredential(rsaEk.outPublic,
                 rsaEk.name, activationData);
     }
+
+    private
 }

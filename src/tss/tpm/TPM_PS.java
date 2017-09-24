@@ -36,7 +36,7 @@ public final class TPM_PS extends TpmEnum<TPM_PS>
         CELL_PHONE,
         
         /**
-        * Server WG
+        * SocketServer WG
         */
         SERVER,
         
