@@ -1,6 +1,6 @@
 package SmartGridBillingSenario.Socket;
 
-import SmartGridBillingSenario.MessageDescription;
+import SmartGridBillingSenario.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
@@ -17,6 +17,6 @@ public class Message implements Serializable {
 
     private static final long serialVersionUID = -5399605122490343339L;
 
-    private MessageDescription description;
+    private MessageType messageType;
     private Object object;
 }

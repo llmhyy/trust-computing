@@ -1,12 +1,23 @@
 package SmartGridBillingSenario;
 
+import SmartGridBillingSenario.Socket.Message;
+import SmartGridBillingSenario.Socket.SocketServer;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import tss.*;
 import tss.tpm.*;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+
+import static SmartGridBillingSenario.MessageType.RESPONSE_FROM_TRE;
 
 /**
  * Created by ydai on 24/9/17.
  */
-public class TRE {
+@Slf4j
+public class TRE extends SocketServer{
 
 
     private Tpm tpm;
@@ -15,9 +26,48 @@ public class TRE {
 
     private Tss.ActivationCredential aik;
 
+    private TPMT_PUBLIC rsaEKTemplate;
+
+    //TSS.key
+    public byte[] privatePart;
+    public TPMT_PUBLIC publicPart;
+
+    @Override
+    public Message handleMessage(Message message) {
+
+        MessageType messageType = message.getMessageType();
+
+        switch (messageType) {
+            case ATTESTATION_REQUEST:
+                return new Message(RESPONSE_FROM_TRE, createKey());
+            case GET_PRICE:
+                try {
+                    return new Message(RESPONSE_FROM_TRE, decryptKeyAndGetPrice(Utils.serialize(message.getObject())));
+                } catch (IOException e) {
+                    log.error("Error when parse data, {}", message.getObject());
+                }
+        }
+        return null;
+    }
+
+    private BigDecimal decryptKeyAndGetPrice(byte[] encrypteKey) {
+        if (encrypteKey == null) {
+            return null;
+        } else {
+            Utils.decrypt(encrypteKey, privatePart);
+        }
+    }
+
     public TRE() {
         tpm = TpmFactory.localTpmSimulator();
+        start();
     }
+
+    public TRE(String host, int port) {
+        tpm = TpmFactory.localTpmSimulator(host, port);
+        start();
+    }
+    
 
     /**
      * TRE create AIK by its EK (see tutorial)
@@ -26,8 +76,6 @@ public class TRE {
         initTpm();
         ek = createEK();
         aik = createAik(ek);
-
-
     }
 
     private void initTpm() {
@@ -35,9 +83,9 @@ public class TRE {
         TPML_HANDLE handles = (TPML_HANDLE) caps.capabilityData;
 
         if (handles.handle.length == 0)
-            System.out.println("No dangling handles");
+            log.info("No dangling handles");
         else for (TPM_HANDLE h : handles.handle)
-            System.out.printf("Dangling handle 0x%08X\n", h.handle);
+            log.info("Dangling handle 0x%08X\n", h.handle);
     }
 
 
@@ -51,7 +99,7 @@ public class TRE {
 
         // Note: this sample allows userWithAuth - a "standard" EK does not (see
         // the other EK sample)
-        TPMT_PUBLIC rsaEkTemplate = new TPMT_PUBLIC(TPM_ALG_ID.SHA256,
+        rsaEKTemplate = new TPMT_PUBLIC(TPM_ALG_ID.SHA256,
                 new TPMA_OBJECT(TPMA_OBJECT.fixedTPM, TPMA_OBJECT.fixedParent, TPMA_OBJECT.sensitiveDataOrigin,
                         TPMA_OBJECT.userWithAuth,
                         /* TPMA_OBJECT.adminWithPolicy, */ TPMA_OBJECT.restricted, TPMA_OBJECT.decrypt),
@@ -59,18 +107,34 @@ public class TRE {
                 new TPMS_RSA_PARMS(new TPMT_SYM_DEF_OBJECT(TPM_ALG_ID.AES, 128, TPM_ALG_ID.CFB),
                         new TPMS_NULL_ASYM_SCHEME(), 2048, 0),
                 new TPM2B_PUBLIC_KEY_RSA());
-
+        log.info("Create EK");
         CreatePrimaryResponse rsaEk = tpm.CreatePrimary(TPM_HANDLE.from(TPM_RH.OWNER),
-                new TPMS_SENSITIVE_CREATE(), rsaEkTemplate, new byte[0], new TPMS_PCR_SELECTION[0]);
+                new TPMS_SENSITIVE_CREATE(), rsaEKTemplate, new byte[0], new TPMS_PCR_SELECTION[0]);
 
         return rsaEk;
     }
 
     private Tss.ActivationCredential createAik(CreatePrimaryResponse rsaEk) {
         byte[] activationData = Helpers.getRandom(16);
+        log.info("Create AIK");
         return Tss.createActivationCredential(rsaEk.outPublic,
                 rsaEk.name, activationData);
     }
 
-    private
+    private TPMT_PUBLIC createKey() {
+        log.info("Create Key");
+        Tss.Key key = Tss.createKey(rsaEKTemplate);
+        privatePart = key.PrivatePart;
+        publicPart = key.PublicPart;
+        return publicPart;
+    }
+
+    private static BigDecimal calculatePrice(String query) {
+
+        if (StringUtils.isNotEmpty(query)) {
+            return new BigDecimal(query);
+        } else {
+            return null;
+        }
+    }
 }
