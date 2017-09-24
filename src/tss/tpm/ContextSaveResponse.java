@@ -1,11 +1,15 @@
 package tss.tpm;
 
-import tss.*;
+import tss.InByteBuf;
+import tss.OutByteBuf;
+import tss.TpmStructure;
+import tss.TpmStructurePrinter;
 
 
 // -----------This is an auto-generated file: do not edit
 
 //>>>
+
 /**
 * This command saves a session context, object context, or sequence object context outside the TPM.
 */
@@ -26,7 +30,7 @@ public class ContextSaveResponse extends TpmStructure
     public ContextSaveResponse() {};
     public TPMS_CONTEXT context;
     @Override
-    public void toTpm(OutByteBuf buf) 
+    public void toTpm(OutByteBuf buf)
     {
         context.toTpm(buf);
         return;
@@ -43,7 +47,7 @@ public class ContextSaveResponse extends TpmStructure
         toTpm(buf);
         return buf.getBuf();
     }
-    public static ContextSaveResponse fromTpm (byte[] x) 
+    public static ContextSaveResponse fromTpm (byte[] x)
     {
         ContextSaveResponse ret = new ContextSaveResponse();
         InByteBuf buf = new InByteBuf(x);
@@ -52,7 +56,7 @@ public class ContextSaveResponse extends TpmStructure
             throw new AssertionError("bytes remaining in buffer after object was de-serialized");
         return ret;
     }
-    public static ContextSaveResponse fromTpm (InByteBuf buf) 
+    public static ContextSaveResponse fromTpm (InByteBuf buf)
     {
         ContextSaveResponse ret = new ContextSaveResponse();
         ret.initFromTpm(buf);

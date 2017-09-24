@@ -6,6 +6,7 @@ import tss.*;
 // -----------This is an auto-generated file: do not edit
 
 //>>>
+
 /**
 * This command returns the current values of Time and Clock.
 */
@@ -17,7 +18,7 @@ public class GetTimeResponse extends TpmStructure
     * @param _timeInfo standard TPM-generated attestation block 
     * @param _signature the signature over timeInfo (One of TPMS_SIGNATURE_RSASSA, TPMS_SIGNATURE_RSAPSS, TPMS_SIGNATURE_ECDSA, TPMS_SIGNATURE_ECDAA, TPMS_SIGNATURE_SM2, TPMS_SIGNATURE_ECSCHNORR, TpmHash, TPMS_SCHEME_HASH, TPMS_NULL_SIGNATURE)
     */
-    public GetTimeResponse(TPMS_ATTEST _timeInfo,TPMU_SIGNATURE _signature)
+    public GetTimeResponse(TPMS_ATTEST _timeInfo, TPMU_SIGNATURE _signature)
     {
         timeInfo = _timeInfo;
         signature = _signature;
@@ -56,7 +57,7 @@ public class GetTimeResponse extends TpmStructure
         throw new RuntimeException("Unrecognized type");
     }
     @Override
-    public void toTpm(OutByteBuf buf) 
+    public void toTpm(OutByteBuf buf)
     {
         buf.writeInt((timeInfo!=null)?timeInfo.toTpm().length:0, 2);
         timeInfo.toTpm(buf);
@@ -73,15 +74,15 @@ public class GetTimeResponse extends TpmStructure
         buf.structSize.pop();
         int _signatureSigAlg = buf.readInt(2);
         signature=null;
-        if(_signatureSigAlg==TPM_ALG_ID.RSASSA.toInt()) {signature = new TPMS_SIGNATURE_RSASSA();}
-        else if(_signatureSigAlg==TPM_ALG_ID.RSAPSS.toInt()) {signature = new TPMS_SIGNATURE_RSAPSS();}
-        else if(_signatureSigAlg==TPM_ALG_ID.ECDSA.toInt()) {signature = new TPMS_SIGNATURE_ECDSA();}
-        else if(_signatureSigAlg==TPM_ALG_ID.ECDAA.toInt()) {signature = new TPMS_SIGNATURE_ECDAA();}
+        if(_signatureSigAlg== TPM_ALG_ID.RSASSA.toInt()) {signature = new TPMS_SIGNATURE_RSASSA();}
+        else if(_signatureSigAlg== TPM_ALG_ID.RSAPSS.toInt()) {signature = new TPMS_SIGNATURE_RSAPSS();}
+        else if(_signatureSigAlg== TPM_ALG_ID.ECDSA.toInt()) {signature = new TPMS_SIGNATURE_ECDSA();}
+        else if(_signatureSigAlg== TPM_ALG_ID.ECDAA.toInt()) {signature = new TPMS_SIGNATURE_ECDAA();}
         // code generator workaround BUGBUG >> (probChild)else if(_signatureSigAlg==TPM_ALG_ID.SM2.toInt()) {signature = new TPMS_SIGNATURE_SM2();}
         // code generator workaround BUGBUG >> (probChild)else if(_signatureSigAlg==TPM_ALG_ID.ECSCHNORR.toInt()) {signature = new TPMS_SIGNATURE_ECSCHNORR();}
         // code generator workaround BUGBUG >> (probChild)else if(_signatureSigAlg==TPM_ALG_ID.HMAC.toInt()) {signature = new TPMT_HA();}
-        else if(_signatureSigAlg==TPM_ALG_ID.ANY.toInt()) {signature = new TPMS_SCHEME_HASH();}
-        else if(_signatureSigAlg==TPM_ALG_ID.NULL.toInt()) {signature = new TPMS_NULL_SIGNATURE();}
+        else if(_signatureSigAlg== TPM_ALG_ID.ANY.toInt()) {signature = new TPMS_SCHEME_HASH();}
+        else if(_signatureSigAlg== TPM_ALG_ID.NULL.toInt()) {signature = new TPMS_NULL_SIGNATURE();}
         if(signature==null)throw new RuntimeException("Unexpected type selector");
         signature.initFromTpm(buf);
     }
@@ -92,7 +93,7 @@ public class GetTimeResponse extends TpmStructure
         toTpm(buf);
         return buf.getBuf();
     }
-    public static GetTimeResponse fromTpm (byte[] x) 
+    public static GetTimeResponse fromTpm (byte[] x)
     {
         GetTimeResponse ret = new GetTimeResponse();
         InByteBuf buf = new InByteBuf(x);
@@ -101,7 +102,7 @@ public class GetTimeResponse extends TpmStructure
             throw new AssertionError("bytes remaining in buffer after object was de-serialized");
         return ret;
     }
-    public static GetTimeResponse fromTpm (InByteBuf buf) 
+    public static GetTimeResponse fromTpm (InByteBuf buf)
     {
         GetTimeResponse ret = new GetTimeResponse();
         ret.initFromTpm(buf);

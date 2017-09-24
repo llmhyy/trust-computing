@@ -11,37 +11,24 @@ import tss.TpmStructurePrinter;
 //>>>
 
 /**
-* This command is used to reload a context that has been saved by TPM2_ContextSave().
+* This command is used to prepare the TPM for a power cycle. The shutdownType parameter indicates how the subsequent TPM2_Startup() will be processed.
 */
-public class TPM2_ContextLoad_REQUEST extends TpmStructure
+public class ShutdownResponse extends TpmStructure
 {
     /**
-    * This command is used to reload a context that has been saved by TPM2_ContextSave().
-    * 
-    * @param _context the context blob
+    * This command is used to prepare the TPM for a power cycle. The shutdownType parameter indicates how the subsequent TPM2_Startup() will be processed.
     */
-    public TPM2_ContextLoad_REQUEST(TPMS_CONTEXT _context)
+    public ShutdownResponse()
     {
-        context = _context;
     }
-    /**
-    * This command is used to reload a context that has been saved by TPM2_ContextSave().
-    */
-    public TPM2_ContextLoad_REQUEST() {};
-    /**
-    * the context blob
-    */
-    public TPMS_CONTEXT context;
     @Override
     public void toTpm(OutByteBuf buf)
     {
-        context.toTpm(buf);
         return;
     }
     @Override
     public void initFromTpm(InByteBuf buf)
     {
-        context = TPMS_CONTEXT.fromTpm(buf);
     }
     @Override
     public byte[] toTpm() 
@@ -50,18 +37,18 @@ public class TPM2_ContextLoad_REQUEST extends TpmStructure
         toTpm(buf);
         return buf.getBuf();
     }
-    public static TPM2_ContextLoad_REQUEST fromTpm (byte[] x)
+    public static ShutdownResponse fromTpm (byte[] x)
     {
-        TPM2_ContextLoad_REQUEST ret = new TPM2_ContextLoad_REQUEST();
+        ShutdownResponse ret = new ShutdownResponse();
         InByteBuf buf = new InByteBuf(x);
         ret.initFromTpm(buf);
         if (buf.bytesRemaining()!=0)
             throw new AssertionError("bytes remaining in buffer after object was de-serialized");
         return ret;
     }
-    public static TPM2_ContextLoad_REQUEST fromTpm (InByteBuf buf)
+    public static ShutdownResponse fromTpm (InByteBuf buf)
     {
-        TPM2_ContextLoad_REQUEST ret = new TPM2_ContextLoad_REQUEST();
+        ShutdownResponse ret = new ShutdownResponse();
         ret.initFromTpm(buf);
         return ret;
     }
@@ -69,7 +56,7 @@ public class TPM2_ContextLoad_REQUEST extends TpmStructure
     @Override
     public String toString()
     {
-        TpmStructurePrinter _p = new TpmStructurePrinter("TPM2_ContextLoad_REQUEST");
+        TpmStructurePrinter _p = new TpmStructurePrinter("TPM2_Shutdown_RESPONSE");
         toStringInternal(_p, 1);
         _p.endStruct();
         return _p.toString();
@@ -78,7 +65,6 @@ public class TPM2_ContextLoad_REQUEST extends TpmStructure
     @Override
     public void toStringInternal(TpmStructurePrinter _p, int d)
     {
-        _p.add(d, "TPMS_CONTEXT", "context", context);
     };
     
     
