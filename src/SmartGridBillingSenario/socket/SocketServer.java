@@ -1,4 +1,4 @@
-package SmartGridBillingSenario.Socket;
+package SmartGridBillingSenario.socket;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +16,7 @@ import java.net.Socket;
 @AllArgsConstructor
 public abstract class SocketServer {
 
-    private int port;
+    protected int port;
     private ServerSocket ss = null;
 
     public void runServer() {
@@ -45,7 +45,8 @@ public abstract class SocketServer {
 
     public abstract Message handleMessage(Message message);
 
-    public SocketServer() {
+    public SocketServer(int port) {
+        this.port = port;
         runServer();
     }
 }

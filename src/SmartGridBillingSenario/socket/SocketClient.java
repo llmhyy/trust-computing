@@ -1,4 +1,4 @@
-package SmartGridBillingSenario.Socket;
+package SmartGridBillingSenario.socket;
 
 
 import lombok.AllArgsConstructor;

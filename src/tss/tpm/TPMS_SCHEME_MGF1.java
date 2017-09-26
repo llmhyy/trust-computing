@@ -80,11 +80,7 @@ public class TPMS_SCHEME_MGF1 extends TpmStructure implements TPMU_SCHEME_KEYEDH
     public void toStringInternal(TpmStructurePrinter _p, int d) {
         _p.add(d, "TPM_ALG_ID", "hashAlg", hashAlg);
     }
-
-    ;
-
-
-};
+}
 
 //<<<
 

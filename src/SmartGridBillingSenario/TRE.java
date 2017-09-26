@@ -1,8 +1,9 @@
 package SmartGridBillingSenario;
 
-import SmartGridBillingSenario.Socket.Message;
-import SmartGridBillingSenario.Socket.SocketServer;
+import SmartGridBillingSenario.socket.Message;
+import SmartGridBillingSenario.socket.SocketServer;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import tss.Helpers;
 import tss.Tpm;
@@ -19,7 +20,7 @@ import static SmartGridBillingSenario.MessageType.RESPONSE_FROM_TRE;
  * Created by ydai on 24/9/17.
  */
 @Slf4j
-public class TRE extends SocketServer{
+public class TRE extends SocketServer {
 
 
     private Tpm tpm;
@@ -29,6 +30,11 @@ public class TRE extends SocketServer{
     private Tss.ActivationCredential aik;
 
     private TPMT_PUBLIC rsaEKTemplate;
+
+    //Quote Related
+    private CreatePrimaryResponse quotingKey;
+    private QuoteResponse quote;
+    private TPMS_PCR_SELECTION[] pcrToQuote;
 
     //TSS.key
     public byte[] privatePart;
@@ -41,7 +47,7 @@ public class TRE extends SocketServer{
 
         switch (messageType) {
             case ATTESTATION_REQUEST:
-                return new Message(RESPONSE_FROM_TRE, createKey());
+                return new Message(RESPONSE_FROM_TRE, publicPart);
             case GET_PRICE:
                 try {
                     return new Message(RESPONSE_FROM_TRE, decryptKeyAndGetPrice(Utils.serialize(message.getObject())));
@@ -61,24 +67,56 @@ public class TRE extends SocketServer{
         }
     }
 
-    public TRE() {
+    public TRE(int serverPort) {
+        super(serverPort);
         tpm = TpmFactory.localTpmSimulator();
         start();
     }
 
-    public TRE(String host, int port) {
+    public TRE(String host, int trePort, int serverPort) {
+        super(serverPort);
         tpm = TpmFactory.localTpmSimulator(host, port);
+        this.port = port;
         start();
     }
-    
+
 
     /**
      * TRE create AIK by its EK (see tutorial)
      */
     public void start() {
         initTpm();
+        quote = initQuote();
         ek = createEK();
-        aik = createAik(ek);
+        //create aik and also put the value into quote
+        signNewData(createAik().toTpm());
+    }
+
+    private QuoteResponse initQuote() {
+
+        // Note that we create the quoting key in the endorsement hierarchy so
+        // that the
+        // CLOCK_INFO is not obfuscated
+        quotingKey  = tpm.CreatePrimary(TPM_HANDLE.from(TPM_RH.ENDORSEMENT),
+                new TPMS_SENSITIVE_CREATE(new byte[0], new byte[0]), rsaEKTemplate, new byte[0],
+                new TPMS_PCR_SELECTION[0]);
+
+        System.out.println("RSA Primary quoting Key: \n" + quotingKey.toString());
+
+        // Set some PCR to non-zero values
+        tpm.PCR_Event(TPM_HANDLE.pcr(10), new byte[]{0, 1, 2});
+        tpm.PCR_Event(TPM_HANDLE.pcr(11), new byte[]{3, 4, 5});
+        tpm.PCR_Event(TPM_HANDLE.pcr(12), new byte[]{6, 7, 8});
+
+        pcrToQuote = new TPMS_PCR_SELECTION[]{
+                new TPMS_PCR_SELECTION(TPM_ALG_ID.SHA256, new int[]{10, 11, 12})};
+
+        // Get the PCR so that we can validate the quote
+        PCR_ReadResponse pcrs = tpm.PCR_Read(pcrToQuote);
+
+
+        byte[] dataToSign = Helpers.getRandom(10);
+        return tpm.Quote(quotingKey.handle, dataToSign, new TPMS_NULL_SIG_SCHEME(), pcrToQuote);
     }
 
     private void initTpm() {
@@ -117,20 +155,20 @@ public class TRE extends SocketServer{
         return rsaEk;
     }
 
-    private Tss.ActivationCredential createAik(CreatePrimaryResponse rsaEk) {
-        byte[] activationData = Helpers.getRandom(16);
-        log.info("Create AIK");
-        return Tss.createActivationCredential(rsaEk.outPublic,
-                rsaEk.name, activationData);
-    }
 
-    private TPMT_PUBLIC createKey() {
+    private TPMT_PUBLIC createAik() {
         log.info("Create Key");
         Tss.Key key = Tss.createKey(rsaEKTemplate);
         privatePart = key.PrivatePart;
         publicPart = key.PublicPart;
         return publicPart;
     }
+
+    private void signNewData(byte[] dataToSign) {
+        byte[] totalData =  ArrayUtils.addAll(dataToSign, quote.toTpm());
+        quote = tpm.Quote(quotingKey.handle, totalData, new TPMS_NULL_SIG_SCHEME(), pcrToQuote);
+    }
+
 
     private static BigDecimal calculatePrice(String query) {
 
