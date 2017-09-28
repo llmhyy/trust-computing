@@ -50,7 +50,8 @@ public class TRE extends SocketServer {
                 return new Message(RESPONSE_FROM_TRE, publicPart);
             case GET_PRICE:
                 try {
-                    return new Message(RESPONSE_FROM_TRE, decryptKeyAndGetPrice(Utils.serialize(message.getObject())));
+                    byte[] totalByte = ArrayUtils.addAll(decryptKeyAndGetPrice(Utils.serialize(message.getObject())).toPlainString().getBytes(), quote.toTpm());
+                    return new Message(RESPONSE_FROM_TRE,  totalByte);
                 } catch (IOException e) {
                     log.error("Error when parse data, {}", message.getObject());
                 }
