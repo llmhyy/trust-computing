@@ -25,7 +25,9 @@ public class PP extends SocketClient {
     }
 
     private void getPublicKey() {
-        TPMT_PUBLIC publicInfo = (TPMT_PUBLIC) sendToPort(new Message(MessageType.ATTESTATION_REQUEST, null)).getObject();
+
+        Message responseForPublicKey  = sendToPort(new Message(MessageType.ATTESTATION_REQUEST, null));
+        TPMT_PUBLIC publicInfo = (TPMT_PUBLIC) responseForPublicKey.getObject();
         publicKey = (TPM2B_PUBLIC_KEY_RSA) publicInfo.unique;
     }
 

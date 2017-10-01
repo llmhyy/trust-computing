@@ -23,7 +23,7 @@ public abstract class SocketServer {
 
         try {
             ss = new ServerSocket(port);
-            log.info("Receive Connection established");
+            log.info("Receive Connection established, with Port = " + port);
             try {
                 Socket clientSocket = ss.accept();
                 ObjectOutputStream os = new ObjectOutputStream(clientSocket.getOutputStream());
@@ -32,6 +32,7 @@ public abstract class SocketServer {
                 Message returnMessage = handleMessage(m);
                 os.writeObject(returnMessage);
                 clientSocket.close();
+
             } catch (Exception ex) {
                 log.error("Message Not Found {}", ex);
             }
@@ -46,6 +47,5 @@ public abstract class SocketServer {
 
     public SocketServer(int port) {
         this.port = port;
-        runServer();
     }
 }

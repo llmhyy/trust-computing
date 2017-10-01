@@ -8,6 +8,6 @@ import SmartGridBillingSenario.TRE;
 public class TREStarter {
 
     public static void main(String[] args) {
-        TRE tre = new TRE(8092);
+        TRE tre = new TRE(5000);
     }
 }

@@ -51,7 +51,7 @@ public class TRE extends SocketServer {
             case GET_PRICE:
                 try {
                     byte[] totalByte = ArrayUtils.addAll(decryptKeyAndGetPrice(Utils.serialize(message.getObject())).toPlainString().getBytes(), quote.toTpm());
-                    return new Message(RESPONSE_FROM_TRE,  totalByte);
+                    return new Message(RESPONSE_FROM_TRE, totalByte);
                 } catch (IOException e) {
                     log.error("Error when parse data, {}", message.getObject());
                 }
@@ -72,6 +72,7 @@ public class TRE extends SocketServer {
         super(serverPort);
         tpm = TpmFactory.localTpmSimulator();
         start();
+        runServer();
     }
 
     public TRE(String host, int trePort, int serverPort) {
@@ -87,8 +88,8 @@ public class TRE extends SocketServer {
      */
     public void start() {
         initTpm();
-        quote = initQuote();
         ek = createEK();
+        quote = initQuote();
         //create aik and also put the value into quote
         signNewData(createAik().toTpm());
     }
@@ -98,8 +99,16 @@ public class TRE extends SocketServer {
         // Note that we create the quoting key in the endorsement hierarchy so
         // that the
         // CLOCK_INFO is not obfuscated
-        quotingKey  = tpm.CreatePrimary(TPM_HANDLE.from(TPM_RH.ENDORSEMENT),
-                new TPMS_SENSITIVE_CREATE(new byte[0], new byte[0]), rsaEKTemplate, new byte[0],
+
+        // Create an RSA restricted signing key in the owner hierarchy
+        TPMT_PUBLIC rsaTemplate = new TPMT_PUBLIC(TPM_ALG_ID.SHA256,
+                new TPMA_OBJECT(TPMA_OBJECT.sign, TPMA_OBJECT.sensitiveDataOrigin, TPMA_OBJECT.userWithAuth,
+                        TPMA_OBJECT.restricted),
+                new byte[0], new TPMS_RSA_PARMS(TPMT_SYM_DEF_OBJECT.nullObject(),
+                new TPMS_SIG_SCHEME_RSASSA(TPM_ALG_ID.SHA256), 2048, 65537),
+                new TPM2B_PUBLIC_KEY_RSA());
+        quotingKey = tpm.CreatePrimary(TPM_HANDLE.from(TPM_RH.ENDORSEMENT),
+                new TPMS_SENSITIVE_CREATE(new byte[0], new byte[0]), rsaTemplate, new byte[0],
                 new TPMS_PCR_SELECTION[0]);
 
         System.out.println("RSA Primary quoting Key: \n" + quotingKey.toString());
@@ -121,38 +130,49 @@ public class TRE extends SocketServer {
     }
 
     private void initTpm() {
+        //CryptoServices.riotTest();
         GetCapabilityResponse caps = tpm.GetCapability(TPM_CAP.HANDLES, TPM_HT.TRANSIENT.toInt() << 24, 8);
         TPML_HANDLE handles = (TPML_HANDLE) caps.capabilityData;
 
         if (handles.handle.length == 0)
-            log.info("No dangling handles");
+            System.out.println("No dangling handles");
         else for (TPM_HANDLE h : handles.handle)
-            log.info("Dangling handle 0x%08X\n", h.handle);
+            System.out.printf("Dangling handle 0x%08X\n", h.handle);
+
+
     }
 
 
     private CreatePrimaryResponse createEK() {
-        // This policy is a "standard" policy that is used with vendor-provided
-        // EKs
-        byte[] standardEKPolicy = new byte[]{(byte) 0x83, 0x71, (byte) 0x97, 0x67, 0x44, (byte) 0x84, (byte) 0xb3,
-                (byte) 0xf8, 0x1a, (byte) 0x90, (byte) 0xcc, (byte) 0x8d, 0x46, (byte) 0xa5, (byte) 0xd7, 0x24,
-                (byte) 0xfd, 0x52, (byte) 0xd7, 0x6e, 0x06, 0x52, 0x0b, 0x64, (byte) 0xf2, (byte) 0xa1, (byte) 0xda,
-                0x1b, 0x33, 0x14, 0x69, (byte) 0xaa};
-
-        // Note: this sample allows userWithAuth - a "standard" EK does not (see
-        // the other EK sample)
-        rsaEKTemplate = new TPMT_PUBLIC(TPM_ALG_ID.SHA256,
+        // Make an RSA primary storage key that can be the target of duplication
+        // operations
+        TPMT_PUBLIC srkTemplate = new TPMT_PUBLIC(TPM_ALG_ID.SHA1,
                 new TPMA_OBJECT(TPMA_OBJECT.fixedTPM, TPMA_OBJECT.fixedParent, TPMA_OBJECT.sensitiveDataOrigin,
-                        TPMA_OBJECT.userWithAuth,
-                        /* TPMA_OBJECT.adminWithPolicy, */ TPMA_OBJECT.restricted, TPMA_OBJECT.decrypt),
-                standardEKPolicy,
-                new TPMS_RSA_PARMS(new TPMT_SYM_DEF_OBJECT(TPM_ALG_ID.AES, 128, TPM_ALG_ID.CFB),
-                        new TPMS_NULL_ASYM_SCHEME(), 2048, 0),
-                new TPM2B_PUBLIC_KEY_RSA());
-        log.info("Create EK");
-        CreatePrimaryResponse rsaEk = tpm.CreatePrimary(TPM_HANDLE.from(TPM_RH.OWNER),
-                new TPMS_SENSITIVE_CREATE(), rsaEKTemplate, new byte[0], new TPMS_PCR_SELECTION[0]);
+                        TPMA_OBJECT.userWithAuth, TPMA_OBJECT.noDA, TPMA_OBJECT.restricted, TPMA_OBJECT.decrypt),
+                new byte[0], new TPMS_ECC_PARMS(new TPMT_SYM_DEF_OBJECT(TPM_ALG_ID.AES, 128, TPM_ALG_ID.CFB),
+                new TPMS_NULL_ASYM_SCHEME(),
+                TPM_ECC_CURVE.NIST_P256,
+                new TPMS_NULL_KDF_SCHEME()),
+                new TPMS_ECC_POINT());
 
+        CreatePrimaryResponse rsaEk = tpm.CreatePrimary(TPM_HANDLE.from(TPM_RH.OWNER),
+                new TPMS_SENSITIVE_CREATE(new byte[0], new byte[0]), srkTemplate, new byte[0],
+                new TPMS_PCR_SELECTION[0]);
+        System.out.println("RSA Primary Key: \n" + rsaEk.toString());
+
+
+        // Use the helper routines in tss.Java to create a duplication
+        // blob *without* using the TPM
+        rsaEKTemplate = new TPMT_PUBLIC(
+                TPM_ALG_ID.SHA1,
+                new TPMA_OBJECT(TPMA_OBJECT.userWithAuth, TPMA_OBJECT.sign),
+                new byte[0],
+                new TPMS_ECC_PARMS(
+                        TPMT_SYM_DEF_OBJECT.nullObject(),
+                        new TPMS_SIG_SCHEME_ECDSA(TPM_ALG_ID.SHA1),
+                        TPM_ECC_CURVE.NIST_P256,
+                        new TPMS_NULL_KDF_SCHEME()),
+                new TPMS_ECC_POINT());
         return rsaEk;
     }
 
@@ -166,7 +186,7 @@ public class TRE extends SocketServer {
     }
 
     private void signNewData(byte[] dataToSign) {
-        byte[] totalData =  ArrayUtils.addAll(dataToSign, quote.toTpm());
+        byte[] totalData = ArrayUtils.addAll(dataToSign, quote.toTpm());
         quote = tpm.Quote(quotingKey.handle, totalData, new TPMS_NULL_SIG_SCHEME(), pcrToQuote);
     }
 
