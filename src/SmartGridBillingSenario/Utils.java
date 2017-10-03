@@ -5,10 +5,11 @@ import javax.crypto.Cipher;
 import java.io.*;
 import java.math.BigInteger;
 import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
-
-import static sun.security.x509.CertificateAlgorithmId.ALGORITHM;
 
 /**
  * Created by ydai on 24/9/17.
@@ -35,9 +36,9 @@ public class Utils {
             RSAPublicKeySpec pubKeySpec = new RSAPublicKeySpec(modulus, pubExp);
             RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(pubKeySpec);
             // get an RSA cipher object and print the provider
-            final Cipher cipher = Cipher.getInstance(ALGORITHM);
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE, buildKeyPair().getPublic());
             // encrypt the plain text using the public key
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
             cipherText = cipher.doFinal(text.getBytes());
         } catch (Exception e) {
             e.printStackTrace();
@@ -61,11 +62,9 @@ public class Utils {
                     key);
           //  RSAPrivateCrtKeySpec privateCrtKeySpec = new RSAPrivateCrtKeySpec()
             // get an RSA cipher object and print the provider
-            final Cipher cipher = Cipher.getInstance(ALGORITHM);
-
             // decrypt the text using the private key
-            // how to use given decrypt key??????
-           // cipher.init(Cipher.DECRYPT_MODE, key);
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.DECRYPT_MODE, buildKeyPair().getPrivate());
             dectyptedText = cipher.doFinal(text);
 
         } catch (Exception ex) {
@@ -73,6 +72,14 @@ public class Utils {
         }
 
         return new String(dectyptedText);
+    }
+
+
+    public static KeyPair buildKeyPair() throws NoSuchAlgorithmException {
+        final int keySize = 2048;
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+        keyPairGenerator.initialize(keySize);
+        return keyPairGenerator.genKeyPair();
     }
 
 
