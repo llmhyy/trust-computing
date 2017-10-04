@@ -1,6 +1,5 @@
 package SmartGridBillingSenario.socket;
 
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -13,11 +12,16 @@ import java.net.Socket;
  * Created by ydai on 24/9/17.
  */
 @Slf4j
-@AllArgsConstructor
 public abstract class SocketServer {
 
     protected int port;
     private ServerSocket ss = null;
+
+    @java.beans.ConstructorProperties({"port", "ss"})
+    public SocketServer(int port, ServerSocket ss) {
+        this.port = port;
+        this.ss = ss;
+    }
 
     public void runServer() {
 
