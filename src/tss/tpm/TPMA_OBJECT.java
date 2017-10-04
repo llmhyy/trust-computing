@@ -1,6 +1,8 @@
 package tss.tpm;
 
 import tss.*;
+
+import java.io.Serializable;
 import java.util.*;
 
 // -----------This is an auto-generated file: do not edit
@@ -9,7 +11,7 @@ import java.util.*;
 /**
 * This attribute structure indicates an objects use, its authorization types, and its relationship to other objects.
 */
-public final class TPMA_OBJECT extends TpmAttribute<TPMA_OBJECT>
+public final class TPMA_OBJECT extends TpmAttribute<TPMA_OBJECT> implements Serializable
 {
     // Values from enum _N are only intended to be used in case labels of a switch statement using the result of this.asEnum() method as the switch condition.
     // However, their Java names are identical to those of the constants defined in this class further below,

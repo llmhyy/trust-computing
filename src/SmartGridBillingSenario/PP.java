@@ -5,10 +5,9 @@ import SmartGridBillingSenario.socket.Message;
 import SmartGridBillingSenario.socket.SocketClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import tss.tpm.TPM2B_PUBLIC_KEY_RSA;
 import tss.tpm.TPMT_PUBLIC;
+import tss.tpm.TPMU_PUBLIC_ID;
 
-import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 
 /**
@@ -17,7 +16,7 @@ import java.security.NoSuchAlgorithmException;
 @Slf4j
 public class PP extends SocketClient {
 
-    private TPM2B_PUBLIC_KEY_RSA publicKey;
+    private transient TPMU_PUBLIC_ID publicKey;
 
 
     public PP(String host, int port) {
@@ -25,28 +24,30 @@ public class PP extends SocketClient {
     }
 
     private void getPublicKey() {
-
-        Message responseForPublicKey  = sendToPort(new Message(MessageType.ATTESTATION_REQUEST, null));
+        log.info("Get Public Key!!");
+        Message responseForPublicKey = sendToPort(new Message(MessageType.ATTESTATION_REQUEST, null));
         TPMT_PUBLIC publicInfo = (TPMT_PUBLIC) responseForPublicKey.getObject();
-        publicKey = (TPM2B_PUBLIC_KEY_RSA) publicInfo.unique;
+        publicKey = (TPMU_PUBLIC_ID) publicInfo.unique;
     }
 
-    private BigDecimal setEncryptQueryAndGetPrice(String query) throws NoSuchAlgorithmException {
+    private String setEncryptQueryAndGetPrice(String query) throws NoSuchAlgorithmException {
 
         if (StringUtils.isNotEmpty(query)) {
-            byte[] encryptedQuery = Utils.encrypt(query, publicKey.buffer);
-            return (BigDecimal) sendToPort(new Message(MessageType.GET_PRICE, encryptedQuery)).getObject();
+            byte[] encryptedQuery = Utils.encrypt(query, publicKey.toTpm());
+            log.info("Send Encrypted value to TRE");
+            return String.valueOf(sendToPort(new Message(MessageType.GET_PRICE, encryptedQuery)).getObject());
         } else {
             return null;
         }
 
     }
 
-    public BigDecimal smartGridBillWorkFlow() {
+    public String smartGridBillWorkFlow() {
         getPublicKey();
         String query = "1000";
         try {
-           return setEncryptQueryAndGetPrice(query);
+            log.info("Start Encryption ");
+            return setEncryptQueryAndGetPrice(query);
         } catch (NoSuchAlgorithmException e) {
             log.error("Error when Encryption", e);
             return null;

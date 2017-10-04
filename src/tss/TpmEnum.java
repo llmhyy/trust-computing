@@ -1,14 +1,18 @@
 package tss;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.TreeMap;
 
-public abstract class TpmEnum<T extends TpmEnum<T>> implements TpmMarshaller {
+public abstract class TpmEnum<T extends TpmEnum<T>> implements TpmMarshaller, Serializable {
 
     protected int Value;
     protected Enum<?> NameAsEnum;
     protected String Name;
+
+    public void TpmEnum() {
+    }
 
     /**
      * Returns the size of the enumeration value used to marshal it to the TPM representation

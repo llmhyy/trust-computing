@@ -1,7 +1,10 @@
 package tss.tpm;
 
-import tss.*;
-import java.util.*;
+import tss.InByteBuf;
+import tss.TpmEnum;
+
+import java.io.Serializable;
+import java.util.Collection;
 
 // -----------This is an auto-generated file: do not edit
 
@@ -9,8 +12,11 @@ import java.util.*;
 /**
 * Table 2 is the list of algorithms to which the TCG has assigned an algorithm identifier along with its numeric identifier.
 */
-public final class TPM_ALG_ID extends TpmEnum<TPM_ALG_ID>
+public class TPM_ALG_ID extends TpmEnum<TPM_ALG_ID> implements Serializable
 {
+
+    public void TPM_ALG_ID() {}
+
     // Values from enum _N are only intended to be used in case labels of a switch statement using the result of this.asEnum() method as the switch condition.
     // However, their Java names are identical to those of the constants defined in this class further below,
     // so for any other usage just prepend them with the TPM_ALG_ID. qualifier.

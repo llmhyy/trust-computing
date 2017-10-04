@@ -37,7 +37,7 @@ public class Utils {
             RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(pubKeySpec);
             // get an RSA cipher object and print the provider
             Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.ENCRYPT_MODE, buildKeyPair().getPublic());
+            cipher.init(Cipher.ENCRYPT_MODE, buildKeyPair().getPrivate());
             // encrypt the plain text using the public key
             cipherText = cipher.doFinal(text.getBytes());
         } catch (Exception e) {
@@ -55,7 +55,7 @@ public class Utils {
      * @throws java.lang.Exception
      */
     public static String decrypt(byte[] text, byte[] key) {
-        byte[] dectyptedText = null;
+        byte[] dectyptedText = text;
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             BigInteger modulus = new BigInteger(1,
@@ -64,8 +64,8 @@ public class Utils {
             // get an RSA cipher object and print the provider
             // decrypt the text using the private key
             Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.DECRYPT_MODE, buildKeyPair().getPrivate());
-            dectyptedText = cipher.doFinal(text);
+            cipher.init(Cipher.DECRYPT_MODE, buildKeyPair().getPublic());
+            dectyptedText = text;
 
         } catch (Exception ex) {
             ex.printStackTrace();

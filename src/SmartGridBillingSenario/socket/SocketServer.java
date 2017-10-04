@@ -28,17 +28,19 @@ public abstract class SocketServer {
         try {
             ss = new ServerSocket(port);
             log.info("Receive Connection established, with Port = " + port);
-            try {
-                Socket clientSocket = ss.accept();
-                ObjectOutputStream os = new ObjectOutputStream(clientSocket.getOutputStream());
-                ObjectInputStream is = new ObjectInputStream(clientSocket.getInputStream());
-                Message m = (Message) is.readObject();
-                Message returnMessage = handleMessage(m);
-                os.writeObject(returnMessage);
-                clientSocket.close();
+            while (true) {
+                try {
+                    Socket clientSocket = ss.accept();
+                    ObjectOutputStream os = new ObjectOutputStream(clientSocket.getOutputStream());
+                    ObjectInputStream is = new ObjectInputStream(clientSocket.getInputStream());
+                    Message m = (Message) is.readObject();
+                    Message returnMessage = handleMessage(m);
+                    os.writeObject(returnMessage);
+                    clientSocket.close();
 
-            } catch (Exception ex) {
-                log.error("Message Not Found {}", ex);
+                } catch (Exception ex) {
+                    log.error("Message Not Found {}", ex);
+                }
             }
 
         } catch (IOException ex) {

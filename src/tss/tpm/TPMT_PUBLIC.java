@@ -2,6 +2,8 @@ package tss.tpm;
 
 import tss.*;
 
+import java.io.Serializable;
+
 
 // -----------This is an auto-generated file: do not edit
 
@@ -9,8 +11,11 @@ import tss.*;
 /**
 * Table 191 defines the public area structure. The Name of the object is nameAlg concatenated with the digest of this structure using nameAlg.
 */
-public class TPMT_PUBLIC extends TpmStructure
+public class TPMT_PUBLIC extends TpmStructure implements Serializable
 {
+
+    static final long serialVersionUID = 1L;
+
     /**
     * Table 191 defines the public area structure. The Name of the object is nameAlg concatenated with the digest of this structure using nameAlg.
     * 

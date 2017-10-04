@@ -4,7 +4,6 @@ import SmartGridBillingSenario.socket.Message;
 import SmartGridBillingSenario.socket.SocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import tss.Helpers;
 import tss.Tpm;
 import tss.TpmFactory;
@@ -12,7 +11,7 @@ import tss.Tss;
 import tss.tpm.*;
 
 import java.io.IOException;
-import java.math.BigDecimal;
+import java.util.Arrays;
 
 import static SmartGridBillingSenario.MessageType.RESPONSE_FROM_TRE;
 
@@ -29,7 +28,7 @@ public class TRE extends SocketServer {
 
     private Tss.ActivationCredential aik;
 
-    private TPMT_PUBLIC rsaEKTemplate;
+    private transient TPMT_PUBLIC rsaEKTemplate;
 
     //Quote Related
     private CreatePrimaryResponse quotingKey;
@@ -38,7 +37,7 @@ public class TRE extends SocketServer {
 
     //TSS.key
     public byte[] privatePart;
-    public TPMT_PUBLIC publicPart;
+    public transient TPMT_PUBLIC publicPart;
 
     @Override
     public Message handleMessage(Message message) {
@@ -47,10 +46,12 @@ public class TRE extends SocketServer {
 
         switch (messageType) {
             case ATTESTATION_REQUEST:
+                log.info("response with Encrypted Key");
                 return new Message(RESPONSE_FROM_TRE, publicPart);
             case GET_PRICE:
                 try {
-                    byte[] totalByte = ArrayUtils.addAll(decryptKeyAndGetPrice(Utils.serialize(message.getObject())).toPlainString().getBytes(), quote.toTpm());
+                    byte[] totalByte = ArrayUtils.addAll(decryptKey(Arrays.copyOf(Utils.serialize(message.getObject()), 256)).getBytes(), quote.toTpm());
+                    log.info("Return with quote and value!");
                     return new Message(RESPONSE_FROM_TRE, totalByte);
                 } catch (IOException e) {
                     log.error("Error when parse data, {}", message.getObject());
@@ -59,12 +60,11 @@ public class TRE extends SocketServer {
         return null;
     }
 
-    private BigDecimal decryptKeyAndGetPrice(byte[] encrypteKey) {
+    private String decryptKey(byte[] encrypteKey) {
         if (encrypteKey == null) {
             return null;
         } else {
-            String finalValue = Utils.decrypt(encrypteKey, privatePart);
-            return calculatePrice(finalValue);
+            return Utils.decrypt(encrypteKey, privatePart);
         }
     }
 
@@ -91,6 +91,7 @@ public class TRE extends SocketServer {
         ek = createEK();
         quote = initQuote();
         //create aik and also put the value into quote
+        log.info("Sign New Quote");
         signNewData(createAik().toTpm());
     }
 
@@ -186,17 +187,6 @@ public class TRE extends SocketServer {
     }
 
     private void signNewData(byte[] dataToSign) {
-        byte[] totalData = ArrayUtils.addAll(dataToSign, quote.toTpm());
-        quote = tpm.Quote(quotingKey.handle, totalData, new TPMS_NULL_SIG_SCHEME(), pcrToQuote);
-    }
-
-
-    private static BigDecimal calculatePrice(String query) {
-
-        if (StringUtils.isNotEmpty(query)) {
-            return new BigDecimal(query);
-        } else {
-            return null;
-        }
+        quote = tpm.Quote(quotingKey.handle, Arrays.copyOf(dataToSign, 10), new TPMS_NULL_SIG_SCHEME(), pcrToQuote);
     }
 }
