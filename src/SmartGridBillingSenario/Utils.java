@@ -1,13 +1,14 @@
 package SmartGridBillingSenario;
 
 
+import org.apache.commons.io.IOUtils;
+
 import javax.crypto.Cipher;
 import java.io.*;
 import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.RSAPublicKeySpec;
 
@@ -19,6 +20,8 @@ public class Utils {
 
     public static final BigInteger pubExp = new BigInteger("010001", 16);
 
+
+    public static final KeyPair keyPair = buildKeyPair();
     /**
      * Encrypt the plain text using public key.
      *
@@ -37,7 +40,7 @@ public class Utils {
             RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(pubKeySpec);
             // get an RSA cipher object and print the provider
             Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.ENCRYPT_MODE, buildKeyPair().getPrivate());
+            cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
             // encrypt the plain text using the public key
             cipherText = cipher.doFinal(text.getBytes());
         } catch (Exception e) {
@@ -64,7 +67,7 @@ public class Utils {
             // get an RSA cipher object and print the provider
             // decrypt the text using the private key
             Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.DECRYPT_MODE, buildKeyPair().getPublic());
+            cipher.init(Cipher.DECRYPT_MODE, keyPair.getPublic());
             dectyptedText = text;
 
         } catch (Exception ex) {
@@ -75,11 +78,17 @@ public class Utils {
     }
 
 
-    public static KeyPair buildKeyPair() throws NoSuchAlgorithmException {
-        final int keySize = 2048;
-        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-        keyPairGenerator.initialize(keySize);
-        return keyPairGenerator.genKeyPair();
+    public static KeyPair buildKeyPair(){
+        try {
+            final int keySize = 2048;
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(keySize);
+            return keyPairGenerator.genKeyPair();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
+        }
+
     }
 
 
@@ -97,6 +106,18 @@ public class Utils {
             try (ObjectInputStream o = new ObjectInputStream(b)) {
                 return o.readObject();
             }
+        }
+    }
+
+    public static byte[] getByteArrayOfClass(Class<?> c) {
+        String className = c.getName();
+        String classAsPath = className.replace('.', '/') + ".class";
+        InputStream stream = c.getClassLoader().getResourceAsStream(classAsPath);
+        try {
+            return IOUtils.toByteArray(stream);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

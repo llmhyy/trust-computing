@@ -1,4 +1,4 @@
-package SmartGridBillingSenario;
+package SmartGridBillingSenario.message;
 
 /**
  * Created by ydai on 24/9/17.

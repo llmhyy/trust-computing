@@ -1,6 +1,6 @@
 package SmartGridBillingSenario.attack;
 
-import SmartGridBillingSenario.socket.Message;
+import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.socket.SocketClient;
 import SmartGridBillingSenario.socket.SocketServer;
 

@@ -1,6 +1,5 @@
-package SmartGridBillingSenario.socket;
+package SmartGridBillingSenario.message;
 
-import SmartGridBillingSenario.MessageType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;

@@ -1,5 +1,6 @@
 package SmartGridBillingSenario.socket;
 
+import SmartGridBillingSenario.message.Message;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;

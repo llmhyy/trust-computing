@@ -16,7 +16,7 @@ public class Calculator {
 
     private Map<String, List<Integer>> memberRateProcessor = new HashMap<>();
 
-    private Calculator() {
+    public Calculator() {
         initMemberRateProcessor();
         initMemberRateMap();
     }

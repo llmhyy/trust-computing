@@ -1,5 +1,6 @@
 package SmartGridBillingSenario.starter;
 
+import SmartGridBillingSenario.Senario;
 import SmartGridBillingSenario.TRE;
 
 /**
@@ -8,6 +9,10 @@ import SmartGridBillingSenario.TRE;
 public class TREStarter {
 
     public static void main(String[] args) {
-        TRE tre = new TRE(5000);
+
+        String type = "NormalSenario";
+        Senario senario = Senario.get(type);
+
+        TRE tre = new TRE(5000, senario);
     }
 }

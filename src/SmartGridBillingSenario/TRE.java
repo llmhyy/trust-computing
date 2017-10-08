@@ -1,6 +1,8 @@
 package SmartGridBillingSenario;
 
-import SmartGridBillingSenario.socket.Message;
+import SmartGridBillingSenario.calculator.Calculator;
+import SmartGridBillingSenario.message.Message;
+import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.socket.SocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -13,7 +15,7 @@ import tss.tpm.*;
 import java.io.IOException;
 import java.util.Arrays;
 
-import static SmartGridBillingSenario.MessageType.RESPONSE_FROM_TRE;
+import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_TRE;
 
 /**
  * Created by ydai on 24/9/17.
@@ -39,6 +41,29 @@ public class TRE extends SocketServer {
     public byte[] privatePart;
     public transient TPMT_PUBLIC publicPart;
 
+    //Current Senario
+    private Senario senario;
+
+    //Current Calculator
+    private Calculator calculator;
+
+
+    public TRE(int serverPort, Senario senario) {
+        super(serverPort);
+        this.senario = senario;
+        tpm = TpmFactory.localTpmSimulator();
+        start();
+        runServer();
+    }
+
+    private String decryptKey(byte[] encrypteKey) {
+        if (encrypteKey == null) {
+            return null;
+        } else {
+            return Utils.decrypt(encrypteKey, privatePart);
+        }
+    }
+
     @Override
     public Message handleMessage(Message message) {
 
@@ -60,29 +85,6 @@ public class TRE extends SocketServer {
         return null;
     }
 
-    private String decryptKey(byte[] encrypteKey) {
-        if (encrypteKey == null) {
-            return null;
-        } else {
-            return Utils.decrypt(encrypteKey, privatePart);
-        }
-    }
-
-    public TRE(int serverPort) {
-        super(serverPort);
-        tpm = TpmFactory.localTpmSimulator();
-        start();
-        runServer();
-    }
-
-    public TRE(String host, int trePort, int serverPort) {
-        super(serverPort);
-        tpm = TpmFactory.localTpmSimulator(host, port);
-        this.port = port;
-        start();
-    }
-
-
     /**
      * TRE create AIK by its EK (see tutorial)
      */
@@ -92,7 +94,9 @@ public class TRE extends SocketServer {
         quote = initQuote();
         //create aik and also put the value into quote
         log.info("Sign New Quote");
-        signNewData(createAik().toTpm());
+        calculator = new Calculator();
+
+        signNewData(Utils.getByteArrayOfClass(calculator.getClass()));
     }
 
     private QuoteResponse initQuote() {
@@ -100,6 +104,7 @@ public class TRE extends SocketServer {
         // Note that we create the quoting key in the endorsement hierarchy so
         // that the
         // CLOCK_INFO is not obfuscated
+
 
         // Create an RSA restricted signing key in the owner hierarchy
         TPMT_PUBLIC rsaTemplate = new TPMT_PUBLIC(TPM_ALG_ID.SHA256,

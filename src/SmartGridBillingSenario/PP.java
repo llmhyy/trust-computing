@@ -1,7 +1,8 @@
 package SmartGridBillingSenario;
 
 
-import SmartGridBillingSenario.socket.Message;
+import SmartGridBillingSenario.message.Message;
+import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.socket.SocketClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -18,9 +19,11 @@ public class PP extends SocketClient {
 
     private transient TPMU_PUBLIC_ID publicKey;
 
+    private Senario senario;
 
-    public PP(String host, int port) {
+    public PP(String host, int port, Senario senario) {
         super(host, port);
+        this.senario = senario;
     }
 
     private void getPublicKey() {
@@ -42,7 +45,6 @@ public class PP extends SocketClient {
 
     }
 
-    //TODO: Calculator for one;
     //TODO: (JVM + Calculator) ByteCode;
     //TODO: Case 1: Execute but return wrong value to PP
     //TODO: Spoof attack and week2
@@ -50,7 +52,7 @@ public class PP extends SocketClient {
     //Hash: Java /
     public String smartGridBillWorkFlow() {
         getPublicKey();
-        String query = "1000";
+        String query = "Mike";
         try {
             log.info("Start Encryption ");
             return setEncryptQueryAndGetPrice(query);
