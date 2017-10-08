@@ -25,7 +25,7 @@ public class PP extends SocketClient {
 
     private Senario senario;
 
-    private String quote = "AHv/VENHgBgAIgALnd7gw+H6OIODJeIMHcGIOGyhxZT4DYn1ZpAxiQsKhrUACsr+ur4AAAA0AMQAAAAAAAaC4QAAABMAAAAAASAVEDAAFFAGAAAAAQALAwAcAAAgYe3TBhMEaP67I3Wf6dYSkal+fg3F6BsWGk9lFcWRwl0AFAALAQAmZEJqGg/ELfir2DUzE/4jfhCNRvtVKu7pEEqo7OTT01y9GYpXP+Y8+X5Oj6nnr01W0C2o616c6J7iZvg8IdEoGBgl6x1c1MjYRyEOCoh7mKwI7J9KUTDXoB+fYS6HZwP2szS8hJlmJyzWNNfnBEa92ES9LH4QiAb/WhqpV59MfXDhZhd0VjDUYVWJNR3oj+Qs5/tDc36JcxXVTK1ZprFeULryYr+4dOgXhvWnrGaVsnDaOSHs4Xvt6fTCUuKNAKdHpRYHcB9BligQif3tY0uZfBhNpDR3CNNZmqzTcQVIktFA5avcmX3+nObyL2PcviB76eWRujbJUpXTug4YF8TX";
+    private String quote = "AHv/VENHgBgAIgALnd7gw+H6OIODJeIMHcGIOGyh";
     public PP(String host, int port, Senario senario) {
         super(host, port);
         this.senario = senario;
