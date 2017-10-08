@@ -3,13 +3,16 @@ package SmartGridBillingSenario;
 
 import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.message.MessageType;
+import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketClient;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import tss.tpm.TPMT_PUBLIC;
 import tss.tpm.TPMU_PUBLIC_ID;
 
+import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 
 /**
  * Created by ydai on 24/9/17.
@@ -20,6 +23,8 @@ public class PP extends SocketClient {
     private transient TPMU_PUBLIC_ID publicKey;
 
     private Senario senario;
+
+    private byte[] quote;
 
     public PP(String host, int port, Senario senario) {
         super(host, port);
@@ -33,16 +38,23 @@ public class PP extends SocketClient {
         publicKey = (TPMU_PUBLIC_ID) publicInfo.unique;
     }
 
-    private String setEncryptQueryAndGetPrice(String query) throws NoSuchAlgorithmException {
+    private String setEncryptQueryAndGetPrice(String query) throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
 
         if (StringUtils.isNotEmpty(query)) {
-            byte[] encryptedQuery = Utils.encrypt(query, publicKey.toTpm());
+            String encryptedQuery = Utils.encrypt(query, publicKey.toTpm());
             log.info("Send Encrypted value to TRE");
-            return String.valueOf(sendToPort(new Message(MessageType.GET_PRICE, encryptedQuery)).getObject());
+            QuoteAndRateResponseMessage quoteAndRateResponseMessage = (QuoteAndRateResponseMessage) sendToPort(new Message(MessageType.GET_PRICE, encryptedQuery)).getObject();
+
+            if (Arrays.equals(quoteAndRateResponseMessage.getQuote(), quote)) {
+                log.info("Great!! Rate Value for user: {} is {}", query, quoteAndRateResponseMessage.getRateValue());
+                return String.valueOf(quoteAndRateResponseMessage.getRateValue());
+            } else {
+                log.error("Error!! Quote Not match!!!");
+                return null;
+            }
         } else {
             return null;
         }
-
     }
 
     //TODO: (JVM + Calculator) ByteCode;
@@ -56,7 +68,7 @@ public class PP extends SocketClient {
         try {
             log.info("Start Encryption ");
             return setEncryptQueryAndGetPrice(query);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (NoSuchAlgorithmException | IOException | ClassNotFoundException e) {
             log.error("Error when Encryption", e);
             return null;
         }

@@ -1,6 +1,7 @@
 package SmartGridBillingSenario;
 
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
 
 import javax.crypto.Cipher;
@@ -30,7 +31,7 @@ public class Utils {
      * @return Encrypted text
      * @throws java.lang.Exception
      */
-    public static byte[] encrypt(String text, byte[] key) {
+    public static String encrypt(String text, byte[] key) {
         byte[] cipherText = null;
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
@@ -42,23 +43,22 @@ public class Utils {
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
             // encrypt the plain text using the public key
-            cipherText = cipher.doFinal(text.getBytes());
+            cipherText = cipher.doFinal(text.getBytes("UTF-8"));
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return cipherText;
+        return Base64.encodeBase64String(cipherText);
     }
 
     /**
      * Decrypt text using private key.
      *
-     * @param text :encrypted text
+     * @param msg :encrypted text
      * @param key  :The private key
      * @return plain text
      * @throws java.lang.Exception
      */
-    public static String decrypt(byte[] text, byte[] key) {
-        byte[] dectyptedText = text;
+    public static String decrypt(String msg, byte[] key) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             BigInteger modulus = new BigInteger(1,
@@ -68,13 +68,12 @@ public class Utils {
             // decrypt the text using the private key
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, keyPair.getPublic());
-            dectyptedText = text;
+            return new String(cipher.doFinal(Base64.decodeBase64(msg)), "UTF-8");
 
         } catch (Exception ex) {
             ex.printStackTrace();
+            return null;
         }
-
-        return new String(dectyptedText);
     }
 
 

@@ -3,16 +3,15 @@ package SmartGridBillingSenario;
 import SmartGridBillingSenario.calculator.Calculator;
 import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.message.MessageType;
+import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketServer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import tss.Helpers;
 import tss.Tpm;
 import tss.TpmFactory;
 import tss.Tss;
 import tss.tpm.*;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_TRE;
@@ -56,7 +55,7 @@ public class TRE extends SocketServer {
         runServer();
     }
 
-    private String decryptKey(byte[] encrypteKey) {
+    private String decryptKey(String encrypteKey) {
         if (encrypteKey == null) {
             return null;
         } else {
@@ -75,10 +74,16 @@ public class TRE extends SocketServer {
                 return new Message(RESPONSE_FROM_TRE, publicPart);
             case GET_PRICE:
                 try {
-                    byte[] totalByte = ArrayUtils.addAll(decryptKey(Arrays.copyOf(Utils.serialize(message.getObject()), 256)).getBytes(), quote.toTpm());
+                    String user = decryptKey(String.valueOf(message.getObject()));
+                    Integer rateValue = calculator.getMemberRateMap().get(user);
                     log.info("Return with quote and value!");
-                    return new Message(RESPONSE_FROM_TRE, totalByte);
-                } catch (IOException e) {
+                    if (senario.equals(Senario.NormalSenario)) {
+                        return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage(quote.toTpm(), rateValue));
+                    } else if (senario.equals(Senario.WrongQuoteSenario)){
+                        return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage(new byte[]{1}, rateValue));
+                    }
+
+                } catch (Exception e) {
                     log.error("Error when parse data, {}", message.getObject());
                 }
         }
@@ -93,6 +98,7 @@ public class TRE extends SocketServer {
         ek = createEK();
         quote = initQuote();
         //create aik and also put the value into quote
+        createAik();
         log.info("Sign New Quote");
         calculator = new Calculator();
 
