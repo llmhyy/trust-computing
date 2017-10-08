@@ -42,6 +42,12 @@ public class PP extends SocketClient {
 
     }
 
+    //TODO: Calculator for one;
+    //TODO: (JVM + Calculator) ByteCode;
+    //TODO: Case 1: Execute but return wrong value to PP
+    //TODO: Spoof attack and week2
+
+    //Hash: Java /
     public String smartGridBillWorkFlow() {
         getPublicKey();
         String query = "1000";
