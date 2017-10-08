@@ -1,4 +1,4 @@
-package SmartGridBillingSenario;
+package SmartGridBillingSenario.utils;
 
 
 import org.apache.commons.codec.binary.Base64;
@@ -10,8 +10,8 @@ import java.math.BigInteger;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.interfaces.RSAPublicKey;
-import java.security.spec.RSAPublicKeySpec;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 /**
  * Created by ydai on 24/9/17.
@@ -22,7 +22,8 @@ public class Utils {
     public static final BigInteger pubExp = new BigInteger("010001", 16);
 
 
-    public static final KeyPair keyPair = buildKeyPair();
+    private static final KeyPair keyPair = buildKeyPair();
+
     /**
      * Encrypt the plain text using public key.
      *
@@ -34,14 +35,11 @@ public class Utils {
     public static String encrypt(String text, byte[] key) {
         byte[] cipherText = null;
         try {
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            BigInteger modulus = new BigInteger(1,
-                    key);
-            RSAPublicKeySpec pubKeySpec = new RSAPublicKeySpec(modulus, pubExp);
-            RSAPublicKey publicKey = (RSAPublicKey) keyFactory.generatePublic(pubKeySpec);
+            PrivateKey privateKey =
+                    KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(key));
             // get an RSA cipher object and print the provider
             Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.ENCRYPT_MODE, keyPair.getPrivate());
+            cipher.init(Cipher.ENCRYPT_MODE, privateKey);
             // encrypt the plain text using the public key
             cipherText = cipher.doFinal(text.getBytes("UTF-8"));
         } catch (Exception e) {
@@ -54,7 +52,7 @@ public class Utils {
      * Decrypt text using private key.
      *
      * @param msg :encrypted text
-     * @param key  :The private key
+     * @param key :The private key
      * @return plain text
      * @throws java.lang.Exception
      */
@@ -63,7 +61,7 @@ public class Utils {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             BigInteger modulus = new BigInteger(1,
                     key);
-          //  RSAPrivateCrtKeySpec privateCrtKeySpec = new RSAPrivateCrtKeySpec()
+            //  RSAPrivateCrtKeySpec privateCrtKeySpec = new RSAPrivateCrtKeySpec()
             // get an RSA cipher object and print the provider
             // decrypt the text using the private key
             Cipher cipher = Cipher.getInstance("RSA");
@@ -77,7 +75,11 @@ public class Utils {
     }
 
 
-    public static KeyPair buildKeyPair(){
+    public static KeyPair buildKeyPair() {
+
+        if (keyPair != null) {
+            return keyPair;
+        }
         try {
             final int keySize = 2048;
             KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");

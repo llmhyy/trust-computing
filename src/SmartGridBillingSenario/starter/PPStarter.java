@@ -1,7 +1,7 @@
 package SmartGridBillingSenario.starter;
 
 import SmartGridBillingSenario.PP;
-import SmartGridBillingSenario.Senario;
+import SmartGridBillingSenario.utils.Senario;
 
 /**
  * Created by yuandai on 28/9/17.

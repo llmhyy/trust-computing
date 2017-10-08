@@ -1,6 +1,6 @@
 package SmartGridBillingSenario.starter;
 
-import SmartGridBillingSenario.Senario;
+import SmartGridBillingSenario.utils.Senario;
 import SmartGridBillingSenario.TRE;
 
 /**

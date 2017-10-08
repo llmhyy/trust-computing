@@ -47,7 +47,7 @@ public class Calculator {
     private void initMemberRateMap() {
 
         if (MapUtils.isNotEmpty(memberRateProcessor)) {
-            memberRateProcessor.entrySet().parallelStream().collect(Collectors.toMap(x -> x.getKey(), y -> calculateRate(y.getValue())));
+            memberRateMap = memberRateProcessor.entrySet().parallelStream().collect(Collectors.toMap(x -> x.getKey(), y -> calculateRate(y.getValue())));
         }
     }
 
