@@ -60,22 +60,22 @@ public class Pcap4jExample {
 // 由于默认过滤器过滤为IP和TCP协议包，可以直接判断rawData长度。
 // 只判断IpV4协议，通过rawData数据得出IpV4头部长度。header_length标识在rawDta第15字节值，即（刨去前14位Ethernet协议长度）的后4个bit，
 // 则IpV4协议头部长度，最长为4位二进制数最大值15(4bit最大值) * 4 = 60 字节（1字节为8位即rawData数组中的一个数字）
-            int ipV4HeaderLength = 0;
+//            int ipV4HeaderLength = 0;
+//            try {
+//                ipV4HeaderLength =
+//                        Integer.parseInt(Integer.toHexString(rawData[14]).charAt(1) + "")
+//                                * 4;
+//            } catch (Exception ex) {
+//                continue;
+//            }
             try {
-                ipV4HeaderLength =
-                        Integer.parseInt(Integer.toHexString(rawData[14]).charAt(1) + "")
-                                * 4;
-            } catch (Exception ex) {
-                continue;
-            }
-            try {
-                ipV4Packet = IpV4Packet.newPacket(rawData, 14, ipV4HeaderLength);
+                ipV4Packet = IpV4Packet.newPacket(rawData, 14, 0);
             } catch (IllegalRawDataException e) {
                 e.printStackTrace();
             }
 
 // tcpOffset 是tcp协议开始的部分，开始于Ethernet协议和IpV4协议头部之后，存在于IpV4协议数据部分里。
-            int tcpOffset = 14 + ipV4HeaderLength;
+            int tcpOffset = 14;
 // 方法解释：rawData数据， 头部的长度(按非数据内容处理)，数据的长度(整个长度-非数据内容长度)
             try {
                 tcpPacket = TcpPacket.newPacket(rawData, tcpOffset, rawData.length - tcpOffset);
