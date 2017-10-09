@@ -21,7 +21,7 @@ public class Pcap4jExample {
 
         int snapLen = 65536;
         PcapNetworkInterface.PromiscuousMode mode = PcapNetworkInterface.PromiscuousMode.PROMISCUOUS;
-        int timeout = 10;
+        int timeout = 100000;
         while (true) {
             PcapHandle handle = nif.openLive(snapLen, mode, timeout);
 

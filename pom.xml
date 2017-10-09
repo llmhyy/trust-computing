@@ -74,6 +74,12 @@
             <version>1.7.2</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/jnetpcap/jnetpcap -->
+        <dependency>
+            <groupId>jnetpcap</groupId>
+            <artifactId>jnetpcap</artifactId>
+            <version>1.4.r1425-1d</version>
+        </dependency>
 
         <dependency>
             <groupId>commons-codec</groupId>
