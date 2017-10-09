@@ -81,7 +81,7 @@ public class TRE extends SocketServer {
                     log.info("Return with quote and value!");
                     if (senario.equals(Senario.NormalSenario)) {
                         return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage(Arrays.copyOf(quote.toTpm(), 30), rateValue));
-                    } else if (senario.equals(Senario.WrongQuoteSenario)){
+                    } else if (senario.equals(Senario.WrongQuoteSenario)) {
                         return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage(new byte[]{1}, rateValue));
                     }
 
@@ -98,7 +98,7 @@ public class TRE extends SocketServer {
     public void start() {
         initTpm();
         ek = createEK();
-        quote = initQuote();
+        initQuote();
         //create aik and also put the value into quote
         createAik();
         log.info("Sign New Quote");
@@ -107,7 +107,7 @@ public class TRE extends SocketServer {
         signNewData(Utils.getByteArrayOfClass(calculator.getClass()));
     }
 
-    private QuoteResponse initQuote() {
+    private void initQuote() {
 
         // Note that we create the quoting key in the endorsement hierarchy so
         // that the
@@ -129,18 +129,9 @@ public class TRE extends SocketServer {
 
         // Set some PCR to non-zero values
         tpm.PCR_Event(TPM_HANDLE.pcr(10), new byte[]{0, 1, 2});
-        tpm.PCR_Event(TPM_HANDLE.pcr(11), new byte[]{3, 4, 5});
-        tpm.PCR_Event(TPM_HANDLE.pcr(12), new byte[]{6, 7, 8});
 
         pcrToQuote = new TPMS_PCR_SELECTION[]{
-                new TPMS_PCR_SELECTION(TPM_ALG_ID.SHA256, new int[]{10, 11, 12})};
-
-        // Get the PCR so that we can validate the quote
-        PCR_ReadResponse pcrs = tpm.PCR_Read(pcrToQuote);
-
-
-        byte[] dataToSign = Helpers.getRandom(10);
-        return tpm.Quote(quotingKey.handle, dataToSign, new TPMS_NULL_SIG_SCHEME(), pcrToQuote);
+                new TPMS_PCR_SELECTION(TPM_ALG_ID.SHA256, new int[]{10})};
     }
 
     private void initTpm() {

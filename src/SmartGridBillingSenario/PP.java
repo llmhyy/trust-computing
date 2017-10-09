@@ -25,7 +25,7 @@ public class PP extends SocketClient {
 
     private Senario senario;
 
-    private String quote = "AHv/VENHgBgAIgALnd7gw+H6OIODJeIMHcGIOGyh";
+    private String quote = "AHv/VENHgBgAIgALZhEyX2VzFWDlx62jA2VVx5Ri";
     public PP(String host, int port, Senario senario) {
         super(host, port);
         this.senario = senario;

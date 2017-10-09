@@ -25,6 +25,7 @@ public class SocketClient {
             Socket client = new Socket(host, port);
 
             log.info("Just connected to " + client.getRemoteSocketAddress());
+            client.getLocalPort();
             OutputStream outToServer = client.getOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(outToServer);
 
