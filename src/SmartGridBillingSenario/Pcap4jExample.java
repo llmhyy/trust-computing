@@ -48,6 +48,7 @@ public class Pcap4jExample {
             if (packet == null) {
                 continue;
             }
+            packet.getHeader();
             byte[] rawData = packet.getRawData();
 // 如果抓包内容长度都小于最小硬件协议长度，则直接返回。
             if (rawData.length < 14) {
@@ -68,11 +69,6 @@ public class Pcap4jExample {
 //            } catch (Exception ex) {
 //                continue;
 //            }
-            try {
-                ipV4Packet = IpV4Packet.newPacket(rawData, 14, 0);
-            } catch (IllegalRawDataException e) {
-                e.printStackTrace();
-            }
 
 // tcpOffset 是tcp协议开始的部分，开始于Ethernet协议和IpV4协议头部之后，存在于IpV4协议数据部分里。
             int tcpOffset = 14;
