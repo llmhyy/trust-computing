@@ -6,14 +6,15 @@ import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketClient;
 import SmartGridBillingSenario.utils.Senario;
-import SmartGridBillingSenario.utils.Utils;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import tss.tpm.TPMT_PUBLIC;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 /**
  * Created by ydai on 24/9/17.
@@ -21,31 +22,36 @@ import java.security.NoSuchAlgorithmException;
 @Slf4j
 public class PP extends SocketClient {
 
-    private transient TPMT_PUBLIC publicInfo;
+    private transient byte[] publicInfo;
 
     private Senario senario;
 
     private String quote = "AHv/VENHgBgAIgALZhEyX2VzFWDlx62jA2VVx5Ri";
+
     public PP(String host, int port, Senario senario) {
         super(host, port);
         this.senario = senario;
     }
 
-    private void getPublicKey() {
+    private void getPublicKey() throws JsonProcessingException {
         log.info("Get Public Key!!");
-        Message responseForPublicKey = sendToPort(new Message(MessageType.ATTESTATION_REQUEST, null));
-        publicInfo = (TPMT_PUBLIC) responseForPublicKey.getObject();
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, ""));
+        Message responseForPublicKey = sendToPort(jsonInString);
+        publicInfo = Base64.decodeBase64(String.valueOf(responseForPublicKey.getObject()));
     }
 
     private String setEncryptQueryAndGetPrice(String query) throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
 
         if (StringUtils.isNotEmpty(query)) {
-           // String encryptedQuery = Utils.encrypt(query, publicInfo.authPolicy);
+            // String encryptedQuery = Utils.encrypt(query, publicInfo.authPolicy);
             String encryptedQuery = query;
             log.info("Send Encrypted value to TRE");
-            QuoteAndRateResponseMessage quoteAndRateResponseMessage = (QuoteAndRateResponseMessage) sendToPort(new Message(MessageType.GET_PRICE, encryptedQuery)).getObject();
-
-            String receivedQuote = Base64.encodeBase64String(quoteAndRateResponseMessage.getQuote());
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonInString = mapper.writeValueAsString(new Message(MessageType.GET_PRICE, encryptedQuery));
+            Map<String, Object> result = (Map<String, Object>) sendToPort(jsonInString).getObject();
+            QuoteAndRateResponseMessage quoteAndRateResponseMessage = new QuoteAndRateResponseMessage(String.valueOf(result.get("quote")), Integer.valueOf(String.valueOf(result.get("rateValue"))));
+            String receivedQuote = quoteAndRateResponseMessage.getQuote();
 
             if (receivedQuote.equals(quote)) {
                 log.info("Great!! Rate Value for user: {} is {}", query, quoteAndRateResponseMessage.getRateValue());
@@ -65,9 +71,9 @@ public class PP extends SocketClient {
 
     //Hash: Java /
     public String smartGridBillWorkFlow() {
-        getPublicKey();
-        String query = "Mike";
         try {
+            getPublicKey();
+            String query = "Mike";
             log.info("Start Encryption ");
             return setEncryptQueryAndGetPrice(query);
         } catch (NoSuchAlgorithmException | IOException | ClassNotFoundException e) {
@@ -76,3 +82,4 @@ public class PP extends SocketClient {
         }
     }
 }
+

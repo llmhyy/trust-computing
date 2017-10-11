@@ -2,14 +2,14 @@ package SmartGridBillingSenario;
 
 import SmartGridBillingSenario.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.pcap4j.core.*;
-import org.pcap4j.packet.*;
+import org.pcap4j.packet.BsdLoopbackPacket;
+import org.pcap4j.packet.IpV4Packet;
+import org.pcap4j.packet.Packet;
+import org.pcap4j.packet.TcpPacket;
 
 import java.io.EOFException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
@@ -56,16 +56,27 @@ public class Pcap4jExample {
                 continue;
             }
 
-
-            String hexValue = Hex.encodeHexString(rawData);
-
-            String value = Utils.convertHexToString(hexValue);
-
-            log.info("Package Aquired, value: {}", value);
-            IpV4Packet ipV4Packet = (IpV4Packet)((BsdLoopbackPacket) packet).getPayload();
-            TcpPacket tcpPacket = (TcpPacket)ipV4Packet.getPayload();
+            IpV4Packet ipV4Packet = (IpV4Packet) ((BsdLoopbackPacket) packet).getPayload();
+            TcpPacket tcpPacket = (TcpPacket) ipV4Packet.getPayload();
 
 
+            // means have more data then header
+            if (tcpPacket.getPayload() != null) {
+
+                byte[] tcpRawData = tcpPacket.getPayload().getRawData();
+                if (tcpRawData.length > 0) {
+                    log.info("TCP, dataoffset {}", tcpRawData.length);
+                    // byte[] dataPart = Arrays.copyOfRange(tcpRawData, tcpRawData.length - dataOffset, tcpRawData.length);
+                    String hexValue = Hex.encodeHexString(tcpRawData);
+                    log.info("Data with Hex value {}", hexValue);
+                    String value = Utils.convertHexToString(hexValue);
+
+                    log.info("Package Aquired, value: {}", value);
+                }
+            }
         }
+
+
     }
 }
+

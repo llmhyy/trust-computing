@@ -2,6 +2,7 @@ package SmartGridBillingSenario.socket;
 
 
 import SmartGridBillingSenario.message.Message;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,7 +19,7 @@ public class SocketClient {
     private String host;
     private int port;
 
-    public Message sendToPort(Message message) {
+    public Message sendToPort(String message) {
         OutputStreamWriter osw;
         try {
             log.info("Connecting to " + host + " on port " + port);
@@ -33,8 +34,9 @@ public class SocketClient {
             InputStream inFromServer = client.getInputStream();
             ObjectInputStream in = new ObjectInputStream(inFromServer);
 
-            Message returnMessage = (Message) in.readObject();
-
+            String returnMessageString = (String) in.readObject();
+            ObjectMapper mapper = new ObjectMapper();
+            Message returnMessage = mapper.readValue(returnMessageString, Message.class);
             log.info("SocketServer return {}", returnMessage);
             client.close();
             return returnMessage;

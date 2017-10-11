@@ -8,7 +8,7 @@ import SmartGridBillingSenario.socket.SocketServer;
 import SmartGridBillingSenario.utils.Senario;
 import SmartGridBillingSenario.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
-import tss.Helpers;
+import org.apache.commons.codec.binary.Base64;
 import tss.Tpm;
 import tss.TpmFactory;
 import tss.Tss;
@@ -73,16 +73,16 @@ public class TRE extends SocketServer {
         switch (messageType) {
             case ATTESTATION_REQUEST:
                 log.info("response with Encrypted Key");
-                return new Message(RESPONSE_FROM_TRE, publicPart);
+                return new Message(RESPONSE_FROM_TRE, Base64.encodeBase64String(publicPart.authPolicy));
             case GET_PRICE:
                 try {
                     String user = decryptKey(String.valueOf(message.getObject()));
                     Integer rateValue = calculator.getMemberRateMap().get(user);
                     log.info("Return with quote and value!");
                     if (senario.equals(Senario.NormalSenario)) {
-                        return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage(Arrays.copyOf(quote.toTpm(), 30), rateValue));
+                        return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage(Base64.encodeBase64String(Arrays.copyOf(quote.toTpm(), 30)), rateValue));
                     } else if (senario.equals(Senario.WrongQuoteSenario)) {
-                        return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage(new byte[]{1}, rateValue));
+                        return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage("1", rateValue));
                     }
 
                 } catch (Exception e) {

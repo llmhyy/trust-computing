@@ -1,15 +1,14 @@
 package SmartGridBillingSenario.socket;
 
 import SmartGridBillingSenario.message.Message;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.SocketAddress;
 
 /**
  * Created by ydai on 24/9/17.
@@ -39,9 +38,14 @@ public abstract class SocketServer {
                   //  log.info("listening on port: {}" , ((InetSocketAddress) socketAddress).getPort());
                     ObjectOutputStream os = new ObjectOutputStream(clientSocket.getOutputStream());
                     ObjectInputStream is = new ObjectInputStream(clientSocket.getInputStream());
-                    Message m = (Message) is.readObject();
+                    String valueString = (String) is.readObject();
+                    ObjectMapper mapper = new ObjectMapper();
+                    Message m = mapper.readValue(valueString, Message.class);
+
                     Message returnMessage = handleMessage(m);
-                    os.writeObject(returnMessage);
+
+
+                    os.writeObject(mapper.writeValueAsString(returnMessage));
                     clientSocket.close();
 
                 } catch (Exception ex) {
