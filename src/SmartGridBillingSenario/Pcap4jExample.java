@@ -1,11 +1,11 @@
 package SmartGridBillingSenario;
 
+import SmartGridBillingSenario.utils.Utils;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.pcap4j.core.*;
-import org.pcap4j.packet.IllegalRawDataException;
-import org.pcap4j.packet.IpV4Packet;
-import org.pcap4j.packet.Packet;
-import org.pcap4j.packet.TcpPacket;
+import org.pcap4j.packet.*;
 
 import java.io.EOFException;
 import java.net.Inet4Address;
@@ -17,6 +17,7 @@ import java.util.concurrent.TimeoutException;
 /**
  * Created by ydai on 8/10/17.
  */
+@Slf4j
 public class Pcap4jExample {
 
     public static void main(String[] args) throws UnknownHostException, PcapNativeException, EOFException, TimeoutException, NotOpenException {
@@ -55,29 +56,16 @@ public class Pcap4jExample {
                 continue;
             }
 
-            String rawDataString = Base64.encodeBase64String(rawData);
-            IpV4Packet ipV4Packet = null;
-            TcpPacket tcpPacket = null;
-// 由于默认过滤器过滤为IP和TCP协议包，可以直接判断rawData长度。
-// 只判断IpV4协议，通过rawData数据得出IpV4头部长度。header_length标识在rawDta第15字节值，即（刨去前14位Ethernet协议长度）的后4个bit，
-// 则IpV4协议头部长度，最长为4位二进制数最大值15(4bit最大值) * 4 = 60 字节（1字节为8位即rawData数组中的一个数字）
-//            int ipV4HeaderLength = 0;
-//            try {
-//                ipV4HeaderLength =
-//                        Integer.parseInt(Integer.toHexString(rawData[14]).charAt(1) + "")
-//                                * 4;
-//            } catch (Exception ex) {
-//                continue;
-//            }
 
-// tcpOffset 是tcp协议开始的部分，开始于Ethernet协议和IpV4协议头部之后，存在于IpV4协议数据部分里。
-            int tcpOffset = 14;
-// 方法解释：rawData数据， 头部的长度(按非数据内容处理)，数据的长度(整个长度-非数据内容长度)
-            try {
-                tcpPacket = TcpPacket.newPacket(rawData, tcpOffset, rawData.length - tcpOffset);
-            } catch (IllegalRawDataException e) {
-                e.printStackTrace();
-            }
+            String hexValue = Hex.encodeHexString(rawData);
+
+            String value = Utils.convertHexToString(hexValue);
+
+            log.info("Package Aquired, value: {}", value);
+            IpV4Packet ipV4Packet = (IpV4Packet)((BsdLoopbackPacket) packet).getPayload();
+            TcpPacket tcpPacket = (TcpPacket)ipV4Packet.getPayload();
+
+
         }
     }
 }

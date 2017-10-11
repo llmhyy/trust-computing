@@ -61,7 +61,7 @@ public class TRE extends SocketServer {
         if (encrypteKey == null) {
             return null;
         } else {
-            return Utils.decrypt(encrypteKey, privatePart);
+            return encrypteKey;
         }
     }
 

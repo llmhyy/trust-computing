@@ -13,6 +13,6 @@ public class TREStarter {
         String type = "NormalSenario";
         Senario senario = Senario.get(type);
 
-        TRE tre = new TRE(5000, senario);
+        TRE tre = new TRE(3000, senario);
     }
 }
