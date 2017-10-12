@@ -3,28 +3,28 @@ package SmartGridBillingSenario.attack;
 import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.socket.SocketClient;
 import SmartGridBillingSenario.socket.SocketServer;
+import org.pcap4j.packet.Packet;
 
 /**
  * Created by yuandai on 28/9/17.
  */
-public class ManInTheMiddle {
+public class ManInTheMiddle extends Pcap4j {
 
-    private Message message;
 
-    private String clientHost;
-    private int clientPort;
+    private String host;
+    private int serverPort;
 
     private MiddleManClient middleManClient;
     private MiddleManServer middleManServer;
 
 
 
-    public ManInTheMiddle(String clientHost, int clientPort, int serverPort) {
-
-        middleManClient = new MiddleManClient(clientHost, clientPort);
-        middleManServer = new MiddleManServer(serverPort);
+    public ManInTheMiddle(String host, int serverPort) {
+        super(host);
+        this.host = host;
+        this.serverPort = serverPort;
+        super.startCapture();
     }
-
 
     private class MiddleManClient extends SocketClient {
 
@@ -44,4 +44,10 @@ public class ManInTheMiddle {
             super(serverPort);
         }
     }
+
+    @Override
+    public void handleTcpData(String srcAddr, String dstAddr, String srcPort, String dstPort, Packet payload) {
+    }
+
 }
+

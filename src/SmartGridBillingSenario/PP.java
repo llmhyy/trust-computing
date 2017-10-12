@@ -28,6 +28,8 @@ public class PP extends SocketClient {
 
     private String quote = "AHv/VENHgBgAIgALZhEyX2VzFWDlx62jA2VVx5Ri";
 
+    private String identity = "password";
+
     public PP(String host, int port, Senario senario) {
         super(host, port);
         this.senario = senario;
@@ -36,7 +38,7 @@ public class PP extends SocketClient {
     private void getPublicKey() throws JsonProcessingException {
         log.info("Get Public Key!!");
         ObjectMapper mapper = new ObjectMapper();
-        String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, ""));
+        String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, identity));
         Message responseForPublicKey = sendToPort(jsonInString);
         publicInfo = Base64.decodeBase64(String.valueOf(responseForPublicKey.getObject()));
     }

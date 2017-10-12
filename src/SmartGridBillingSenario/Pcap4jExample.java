@@ -1,9 +1,7 @@
 package SmartGridBillingSenario;
 
 import SmartGridBillingSenario.attack.Pcap4j;
-import SmartGridBillingSenario.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.binary.Hex;
 import org.pcap4j.core.NotOpenException;
 import org.pcap4j.core.PcapNativeException;
 import org.pcap4j.packet.Packet;
@@ -11,6 +9,8 @@ import org.pcap4j.packet.Packet;
 import java.io.EOFException;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
+
+import static SmartGridBillingSenario.utils.Utils.getTcpValue;
 
 /**
  * Created by ydai on 8/10/17.
@@ -29,8 +29,7 @@ public class Pcap4jExample {
 
                     log.info("Src = {}:{}", srcAddr, srcPort);
                     log.info("Dst = {}:{}", dstAddr, dstPort);
-                    String hexValue = Hex.encodeHexString(tcpRawData);
-                    String value = Utils.convertHexToString(hexValue).substring(3);
+                    String value = getTcpValue(tcpRawData);
                     log.info("Package Aquired, value: {}", value);
                 }
             }

@@ -1,7 +1,11 @@
 package SmartGridBillingSenario.utils;
 
 
+import SmartGridBillingSenario.message.Message;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 
 import javax.crypto.Cipher;
@@ -92,24 +96,6 @@ public class Utils {
 
     }
 
-
-    public static byte[] serialize(Object obj) throws IOException {
-        try (ByteArrayOutputStream b = new ByteArrayOutputStream()) {
-            try (ObjectOutputStream o = new ObjectOutputStream(b)) {
-                o.writeObject(obj);
-            }
-            return b.toByteArray();
-        }
-    }
-
-    public static Object deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
-        try (ByteArrayInputStream b = new ByteArrayInputStream(bytes)) {
-            try (ObjectInputStream o = new ObjectInputStream(b)) {
-                return o.readObject();
-            }
-        }
-    }
-
     public static byte[] getByteArrayOfClass(Class<?> c) {
         String className = c.getName();
         String classAsPath = className.replace('.', '/') + ".class";
@@ -122,24 +108,44 @@ public class Utils {
         }
     }
 
-    public static String convertHexToString(String hex){
+    public static String convertHexToString(String hex) {
 
         StringBuilder sb = new StringBuilder();
         StringBuilder temp = new StringBuilder();
 
         //49204c6f7665204a617661 split into two characters 49, 20, 4c...
-        for( int i=0; i<hex.length()-1; i+=2 ){
+        for (int i = 0; i < hex.length() - 1; i += 2) {
 
             //grab the hex in pairs
             String output = hex.substring(i, (i + 2));
             //convert hex to decimal
             int decimal = Integer.parseInt(output, 16);
             //convert the decimal to character
-            sb.append((char)decimal);
+            sb.append((char) decimal);
 
             temp.append(decimal);
         }
-
         return sb.toString();
+    }
+
+    public static String getTcpValue(byte[] rawData) {
+
+        String hexValue = Hex.encodeHexString(rawData);
+        String value = Utils.convertHexToString(hexValue).substring(3);
+        return value;
+    }
+
+    public static Message stringToMessage(String value) throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(value, Message.class);
+    }
+
+    public static String messageToString(Message message) throws JsonProcessingException {
+        if (message == null) {
+            return "";
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.writeValueAsString(message);
     }
 }

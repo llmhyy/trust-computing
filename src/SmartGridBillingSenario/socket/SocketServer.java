@@ -44,8 +44,9 @@ public abstract class SocketServer {
 
                     Message returnMessage = handleMessage(m);
 
-
-                    os.writeObject(mapper.writeValueAsString(returnMessage));
+                    if (returnMessage != null) {
+                        os.writeObject(mapper.writeValueAsString(returnMessage));
+                    }
                     clientSocket.close();
 
                 } catch (Exception ex) {

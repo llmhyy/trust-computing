@@ -48,6 +48,7 @@ public class TRE extends SocketServer {
     //Current Calculator
     private Calculator calculator;
 
+    private String ppIdentity = "password";
 
     public TRE(int serverPort, Senario senario) {
         super(serverPort);
@@ -73,7 +74,13 @@ public class TRE extends SocketServer {
         switch (messageType) {
             case ATTESTATION_REQUEST:
                 log.info("response with Encrypted Key");
-                return new Message(RESPONSE_FROM_TRE, Base64.encodeBase64String(publicPart.authPolicy));
+                String identity = String.valueOf(message.getObject());
+                if (identity.equals(ppIdentity)) {
+                    return new Message(RESPONSE_FROM_TRE, Base64.encodeBase64String(publicPart.authPolicy));
+                } else {
+                    log.error("Wrong Identity, you are fake PP!!!");
+                    return null;
+                }
             case GET_PRICE:
                 try {
                     String user = decryptKey(String.valueOf(message.getObject()));
