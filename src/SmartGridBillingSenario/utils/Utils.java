@@ -139,7 +139,6 @@ public class Utils {
 
             temp.append(decimal);
         }
-        System.out.println("Decimal : " + temp.toString());
 
         return sb.toString();
     }
