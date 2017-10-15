@@ -19,12 +19,19 @@ import static SmartGridBillingSenario.utils.Utils.getTcpValue;
 
 /**
  * Created by yuandai on 4/10/17.
+ *
+ *
+ * Replay attack, FakePP capture the Real PP Authentication, resend the get public key request to TRE,
+ * and pass the authentication, get result for User JACK.
+ *
  */
 @Slf4j
 public class FakePP extends Pcap4j {
 
     private String clientHost;
     private int serverPort;
+
+    private int fakePPPort;
 
     private FakePPClient fakePPClient;
 
@@ -40,7 +47,8 @@ public class FakePP extends Pcap4j {
     @Override
     public void handleTcpData(String srcAddr, String dstAddr, String srcPort, String dstPort, Packet payload) {
 
-        if (Integer.valueOf(dstPort) == serverPort) {
+        //get message send to TRE and make sure it is not sent by FakePP itself
+        if (Integer.valueOf(dstPort) == serverPort && Integer.valueOf(srcPort) != fakePPPort) {
             log.info("Get Info send to server!!! HAHA!!!");
 
             byte[] tcpRawData = payload.getRawData();
@@ -88,6 +96,7 @@ public class FakePP extends Pcap4j {
             ObjectMapper mapper = new ObjectMapper();
             String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, password));
             Message responseForPublicKey = sendToPort(jsonInString);
+            fakePPPort = this.clientPort;
             return String.valueOf(responseForPublicKey.getObject());
         }
 

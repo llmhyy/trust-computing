@@ -16,17 +16,25 @@ import java.net.Socket;
 @AllArgsConstructor
 public class SocketClient {
 
-    private String host;
-    private int port;
+    private String serverHost;
+    private int serverPort;
+
+    protected int clientPort;
+
+
+    public SocketClient(String serverHost, int serverPort) {
+        this.serverHost = serverHost;
+        this.serverPort = serverPort;
+    }
 
     public Message sendToPort(String message) {
         OutputStreamWriter osw;
         try {
-            log.info("Connecting to " + host + " on port " + port);
-            Socket client = new Socket(host, port);
+            log.info("Connecting to " + serverHost + " on port " + serverPort);
+            Socket client = new Socket(serverHost, serverPort);
 
             log.info("Just connected to " + client.getRemoteSocketAddress());
-            client.getLocalPort();
+            clientPort = client.getLocalPort();
             OutputStream outToServer = client.getOutputStream();
             ObjectOutputStream out = new ObjectOutputStream(outToServer);
 
