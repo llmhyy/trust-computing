@@ -6,6 +6,7 @@ import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketClient;
 import SmartGridBillingSenario.utils.Senario;
+import SmartGridBillingSenario.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -46,8 +47,7 @@ public class PP extends SocketClient {
     private String setEncryptQueryAndGetPrice(String query) throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
 
         if (StringUtils.isNotEmpty(query)) {
-            // String encryptedQuery = Utils.encrypt(query, publicInfo.authPolicy);
-            String encryptedQuery = query;
+            String encryptedQuery = Utils.encrypt(query, publicInfo);
             log.info("Send Encrypted value to TRE");
             ObjectMapper mapper = new ObjectMapper();
             String jsonInString = mapper.writeValueAsString(new Message(MessageType.GET_PRICE, encryptedQuery));

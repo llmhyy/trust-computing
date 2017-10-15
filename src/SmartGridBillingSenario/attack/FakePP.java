@@ -8,6 +8,7 @@ import SmartGridBillingSenario.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.pcap4j.packet.Packet;
 
@@ -76,11 +77,11 @@ public class FakePP extends Pcap4j {
      */
     private void startAttack() throws IOException, NoSuchAlgorithmException, ClassNotFoundException {
         fakePPClient = new FakePPClient(clientHost, serverPort);
-        String publicKey = fakePPClient.getPublicKey();
+        byte[] publicKey = fakePPClient.getPublicKey();
         String query = "Jack";
 
-        String response = fakePPClient.setEncryptQueryAndGetPrice(query);
-        log.info("Successfully replace the PP to steal the Rate for Jack!!");
+        String response = fakePPClient.setEncryptQueryAndGetPrice(query, publicKey);
+        log.info("Successfully replace the PP to steal the Rate for Jack!!, Response: {}", response);
     }
 
 
@@ -91,20 +92,19 @@ public class FakePP extends Pcap4j {
         }
 
 
-        private String getPublicKey() throws JsonProcessingException {
+        private byte[] getPublicKey() throws JsonProcessingException {
             log.info("Get Public Key!!");
             ObjectMapper mapper = new ObjectMapper();
             String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, password));
             Message responseForPublicKey = sendToPort(jsonInString);
             fakePPPort = this.clientPort;
-            return String.valueOf(responseForPublicKey.getObject());
+            return Base64.decodeBase64(String.valueOf(responseForPublicKey.getObject()));
         }
 
-        private String setEncryptQueryAndGetPrice(String query) throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
+        private String setEncryptQueryAndGetPrice(String query, byte[] publicInfo) throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
 
             if (StringUtils.isNotEmpty(query)) {
-                // String encryptedQuery = Utils.encrypt(query, publicInfo.authPolicy);
-                String encryptedQuery = query;
+                String encryptedQuery = Utils.encrypt(query, publicInfo);
                 log.info("Send Encrypted value to TRE");
                 ObjectMapper mapper = new ObjectMapper();
                 String jsonInString = mapper.writeValueAsString(new Message(MessageType.GET_PRICE, encryptedQuery));

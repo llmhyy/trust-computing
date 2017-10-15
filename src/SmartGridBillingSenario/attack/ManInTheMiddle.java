@@ -3,11 +3,13 @@ package SmartGridBillingSenario.attack;
 import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.socket.SocketClient;
 import SmartGridBillingSenario.socket.SocketServer;
+import lombok.extern.slf4j.Slf4j;
 import org.pcap4j.packet.Packet;
 
 /**
  * Created by yuandai on 28/9/17.
  */
+@Slf4j
 public class ManInTheMiddle extends Pcap4j {
 
 
@@ -47,7 +49,6 @@ public class ManInTheMiddle extends Pcap4j {
 
     @Override
     public void handleTcpData(String srcAddr, String dstAddr, String srcPort, String dstPort, Packet payload) {
-
     }
 
 }
