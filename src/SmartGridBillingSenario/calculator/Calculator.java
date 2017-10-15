@@ -31,7 +31,7 @@ public class Calculator {
         // second member Jack
         String jack = "Jack";
         List<Integer> jackSevenDayUsage = Arrays.asList(2, 3, 4, 5, 6, 7, 8);
-        memberRateProcessor.put(jack, mikeSevenDayUsage);
+        memberRateProcessor.put(jack, jackSevenDayUsage);
 
         //third member Kate
         String kate = "kate";
