@@ -16,7 +16,8 @@ import tss.tpm.*;
 
 import java.util.Arrays;
 
-import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_TRE;
+import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_TRE_ATTESTATION_REQUEST;
+import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_TRE_GET_PRICE;
 
 /**
  * Created by ydai on 24/9/17.
@@ -76,7 +77,7 @@ public class TRE extends SocketServer {
                 log.info("response with Encrypted Key");
                 String identity = String.valueOf(message.getObject());
                 if (identity.equals(ppIdentity)) {
-                    return new Message(RESPONSE_FROM_TRE, Base64.encodeBase64String(publicPart.authPolicy));
+                    return new Message(RESPONSE_FROM_TRE_ATTESTATION_REQUEST, Base64.encodeBase64String(publicPart.authPolicy));
                 } else {
                     log.error("Wrong Identity, you are fake PP!!!");
                     return null;
@@ -87,9 +88,9 @@ public class TRE extends SocketServer {
                     Integer rateValue = calculator.getMemberRateMap().get(user);
                     log.info("Return with quote and value!");
                     if (senario.equals(Senario.NormalSenario)) {
-                        return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage(Base64.encodeBase64String(quote.toQuote()), rateValue));
+                        return new Message(RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage(Base64.encodeBase64String(quote.toQuote()), rateValue));
                     } else if (senario.equals(Senario.WrongQuoteSenario)) {
-                        return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage("1", rateValue));
+                        return new Message(RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage("1", rateValue));
                     }
 
                 } catch (Exception e) {

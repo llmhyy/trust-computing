@@ -18,7 +18,7 @@ public abstract class Pcap4j {
 
     private static final String networkInterfaceName = "lo0";
 
-    private static int snaplen = 128 * 1024;
+    private static int snaplen = 1024 * 1024;
 
     private Thread pcapSnapThread;
 
