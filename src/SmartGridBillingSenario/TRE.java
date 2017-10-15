@@ -87,7 +87,7 @@ public class TRE extends SocketServer {
                     Integer rateValue = calculator.getMemberRateMap().get(user);
                     log.info("Return with quote and value!");
                     if (senario.equals(Senario.NormalSenario)) {
-                        return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage(Base64.encodeBase64String(Arrays.copyOf(quote.toTpm(), 30)), rateValue));
+                        return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage(Base64.encodeBase64String(quote.toQuote()), rateValue));
                     } else if (senario.equals(Senario.WrongQuoteSenario)) {
                         return new Message(RESPONSE_FROM_TRE, new QuoteAndRateResponseMessage("1", rateValue));
                     }

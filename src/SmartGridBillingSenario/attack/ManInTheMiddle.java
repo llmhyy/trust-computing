@@ -47,6 +47,7 @@ public class ManInTheMiddle extends Pcap4j {
 
     @Override
     public void handleTcpData(String srcAddr, String dstAddr, String srcPort, String dstPort, Packet payload) {
+
     }
 
 }
