@@ -26,19 +26,56 @@ public abstract class SocketServer {
     }
 
     public void runServer() {
-
         try {
             ss = new ServerSocket(port);
-            log.info("Receive Connection established, with Port = " + port);
+        } catch (IOException ex) {
+            log.error("IO Exception {}", ex);
+        }
+        while (true) {
+            try {
+                log.info("Receive Connection established, with Port = " + port);
+                Socket clientSocket = ss.accept();
+                new SocketServerThread(clientSocket).start();
+            } catch (IOException ex) {
+                log.error("IO Exception {}", ex);
+            }
+        }
+    }
+
+
+    public abstract Message handleMessage(Message message);
+
+    public SocketServer(int port) {
+        this.port = port;
+    }
+
+
+    private class SocketServerThread extends Thread {
+        protected Socket socket;
+
+        private ObjectOutputStream os;
+        private ObjectInputStream is;
+
+        public SocketServerThread(Socket clientSocket) throws IOException {
+            this.socket = clientSocket;
+            os = new ObjectOutputStream(socket.getOutputStream());
+            is = new ObjectInputStream(socket.getInputStream());
+
+        }
+
+        public void run() {
             while (true) {
                 try {
-                    Socket clientSocket = ss.accept();
-                   // SocketAddress socketAddress = ss.accept().getRemoteSocketAddress();
+                    // SocketAddress socketAddress = ss.accept().getRemoteSocketAddress();
+                    //  log.info("listening on port: {}" , ((InetSocketAddress) socketAddress).getPort());
+                    String valueString = "";
+                    try {
+                        valueString = (String) is.readObject();
+                    } catch (Exception ex) {
+                        continue;
+                    }
 
-                  //  log.info("listening on port: {}" , ((InetSocketAddress) socketAddress).getPort());
-                    ObjectOutputStream os = new ObjectOutputStream(clientSocket.getOutputStream());
-                    ObjectInputStream is = new ObjectInputStream(clientSocket.getInputStream());
-                    String valueString = (String) is.readObject();
+
                     ObjectMapper mapper = new ObjectMapper();
                     Message m = mapper.readValue(valueString, Message.class);
 
@@ -47,22 +84,12 @@ public abstract class SocketServer {
                     if (returnMessage != null) {
                         os.writeObject(mapper.writeValueAsString(returnMessage));
                     }
-                    clientSocket.close();
 
                 } catch (Exception ex) {
                     log.error("Message Not Found {}", ex);
                 }
             }
 
-        } catch (IOException ex) {
-            log.error("IO Exception {}", ex);
         }
-
-    }
-
-    public abstract Message handleMessage(Message message);
-
-    public SocketServer(int port) {
-        this.port = port;
     }
 }

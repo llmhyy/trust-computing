@@ -20,33 +20,43 @@ public class SocketClient {
     private int serverPort;
 
     protected int clientPort;
-
+    private Socket client;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
 
     public SocketClient(String serverHost, int serverPort) {
         this.serverHost = serverHost;
         this.serverPort = serverPort;
+        try {
+            client = new Socket(serverHost, serverPort);
+            OutputStream outToServer = client.getOutputStream();
+
+            out = new ObjectOutputStream(outToServer);
+
+            InputStream inFromServer = client.getInputStream();
+            in = new ObjectInputStream(inFromServer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public Message sendToPort(String message) {
         OutputStreamWriter osw;
         try {
             log.info("Connecting to " + serverHost + " on port " + serverPort);
-            Socket client = new Socket(serverHost, serverPort);
+
 
             log.info("Just connected to " + client.getRemoteSocketAddress());
             clientPort = client.getLocalPort();
-            OutputStream outToServer = client.getOutputStream();
-            ObjectOutputStream out = new ObjectOutputStream(outToServer);
+
 
             out.writeObject(message);
-            InputStream inFromServer = client.getInputStream();
-            ObjectInputStream in = new ObjectInputStream(inFromServer);
 
             String returnMessageString = (String) in.readObject();
             ObjectMapper mapper = new ObjectMapper();
             Message returnMessage = mapper.readValue(returnMessageString, Message.class);
             log.info("SocketServer return {}", returnMessage);
-            client.close();
+            //client.close();
             return returnMessage;
         } catch (IOException e) {
             log.error("IO Exception: {}", e);
