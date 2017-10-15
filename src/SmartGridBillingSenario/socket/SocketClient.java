@@ -44,12 +44,6 @@ public class SocketClient {
         OutputStreamWriter osw;
         try {
             log.info("Connecting to " + serverHost + " on port " + serverPort);
-
-
-            log.info("Just connected to " + client.getRemoteSocketAddress());
-            clientPort = client.getLocalPort();
-
-
             out.writeObject(message);
 
             String returnMessageString = (String) in.readObject();

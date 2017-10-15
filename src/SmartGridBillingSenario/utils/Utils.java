@@ -8,13 +8,13 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
 
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import java.io.*;
 import java.math.BigInteger;
-import java.security.KeyFactory;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
+import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 /**
@@ -60,8 +60,7 @@ public class Utils {
      * @return plain text
      * @throws java.lang.Exception
      */
-    public static String decrypt(String msg, byte[] key) {
-        try {
+    public static String decrypt(String msg, byte[] key) throws BadPaddingException, IllegalBlockSizeException, UnsupportedEncodingException, InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             BigInteger modulus = new BigInteger(1,
                     key);
@@ -71,11 +70,6 @@ public class Utils {
             Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, keyPair.getPublic());
             return new String(cipher.doFinal(Base64.decodeBase64(msg)), "UTF-8");
-
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return null;
-        }
     }
 
 
