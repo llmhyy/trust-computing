@@ -29,6 +29,7 @@ public class SocketClient {
         this.serverPort = serverPort;
         try {
             client = new Socket(serverHost, serverPort);
+            clientPort = client.getLocalPort();
             OutputStream outToServer = client.getOutputStream();
 
             out = new ObjectOutputStream(outToServer);

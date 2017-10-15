@@ -5,6 +5,7 @@ import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketClient;
+import SmartGridBillingSenario.socket.SocketServer;
 import SmartGridBillingSenario.utils.Senario;
 import SmartGridBillingSenario.utils.Utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,9 +32,21 @@ public class PP extends SocketClient {
 
     private String identity = "password";
 
+    private Thread ppServerThread;
+
     public PP(String host, int port, Senario senario) {
         super(host, port);
         this.senario = senario;
+
+
+        ppServerThread = new Thread() {
+            public void run() {
+                SocketServer ppSocketServer = new PpSocketServer(clientPort);
+                ppSocketServer.runServer();
+            }
+        };
+
+        ppServerThread.start();
     }
 
     private void getPublicKey() throws JsonProcessingException {
@@ -74,7 +87,7 @@ public class PP extends SocketClient {
             String query = "Mike";
             log.info("Start Encryption ");
             String value = setEncryptQueryAndGetPrice(query);
-            Thread.sleep(100000);
+            Thread.sleep(10000);
             return value;
         } catch (NoSuchAlgorithmException | IOException | ClassNotFoundException e) {
             log.error("Error when Encryption", e);
@@ -82,6 +95,42 @@ public class PP extends SocketClient {
         } catch (InterruptedException e) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+
+    private class PpSocketServer extends SocketServer {
+
+        @Override
+        public Message handleMessage(Message message) {
+            MessageType messageType = message.getMessageType();
+            switch (messageType) {
+                case RESPONSE_FROM_TRE_ATTESTATION_REQUEST:
+                    byte[] publicKey = Base64.decodeBase64(String.valueOf(message.getObject()));
+                    String query = "Mike";
+                    log.info("Start Encryption ");
+                    try {
+                        String encryptedQuery = Utils.encrypt(query, publicKey);
+                        log.info("Send Encrypted value to TRE");
+                        ObjectMapper mapper = new ObjectMapper();
+                        String jsonInString = mapper.writeValueAsString(new Message(MessageType.GET_PRICE, encryptedQuery));
+                        return Utils.stringToMessage(jsonInString);
+                    } catch (IOException e) {
+                        log.error("{}", e);
+                    }
+                    break;
+                case RESPONSE_FROM_TRE_GET_PRICE:
+                    Map<String, Object> result = (Map<String, Object>) message.getObject();
+                    QuoteAndRateResponseMessage quoteAndRateResponseMessage = new QuoteAndRateResponseMessage(String.valueOf(result.get("quote")), Integer.valueOf(String.valueOf(result.get("rateValue"))));
+                    log.info("Great!! Rate Value for user: {}", quoteAndRateResponseMessage.getRateValue());
+                    return null;
+            }
+
+            return null;
+        }
+
+        public PpSocketServer(int serverPort) {
+            super(serverPort);
         }
     }
 }

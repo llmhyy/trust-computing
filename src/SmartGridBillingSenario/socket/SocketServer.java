@@ -19,12 +19,6 @@ public abstract class SocketServer {
     protected int port;
     private ServerSocket ss = null;
 
-    @java.beans.ConstructorProperties({"port", "ss"})
-    public SocketServer(int port, ServerSocket ss) {
-        this.port = port;
-        this.ss = ss;
-    }
-
     public void runServer() {
         try {
             ss = new ServerSocket(port);
