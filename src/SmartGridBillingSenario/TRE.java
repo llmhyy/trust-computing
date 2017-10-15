@@ -82,6 +82,13 @@ public class TRE extends SocketServer {
             case ATTESTATION_REQUEST:
                 log.info("response with Encrypted Key");
                 String identity = String.valueOf(message.getObject());
+                if (senario.equals(Senario.manInTheMiddleSenario)) {
+                    try {
+                        Thread.sleep(10000);
+                    } catch (InterruptedException e) {
+                        log.error("Error in thread: {}", e);
+                    }
+                }
                 if (identity.equals(ppIdentity)) {
                     return new Message(RESPONSE_FROM_TRE_ATTESTATION_REQUEST, Base64.encodeBase64String(publicPart.authPolicy));
                 } else {

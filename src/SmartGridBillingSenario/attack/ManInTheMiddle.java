@@ -107,6 +107,8 @@ public class ManInTheMiddle extends Pcap4j {
                         String user = decryptKey(String.valueOf(message.getObject()));
                         log.info("HAHA!! Get USER from PP {}, can send this user to TRE to get response", user);
                         sendEncryptedUserToTre(user);
+                    } else if (message.getMessageType().equals(MessageType.ATTESTATION_REQUEST)){
+                        sendOwnPublicKeyToPp();
                     }
                 } catch (Exception e) {
                     return;

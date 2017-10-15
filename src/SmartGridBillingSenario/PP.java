@@ -32,7 +32,7 @@ public class PP extends SocketClient {
 
     private String identity = "password";
 
-    private Thread ppServerThread;
+    public Thread ppServerThread;
 
     public PP(String host, int port, Senario senario) {
         super(host, port);
@@ -49,12 +49,17 @@ public class PP extends SocketClient {
         ppServerThread.start();
     }
 
-    private void getPublicKey() throws JsonProcessingException {
+    private boolean getPublicKey() throws JsonProcessingException {
         log.info("Get Public Key!!");
         ObjectMapper mapper = new ObjectMapper();
         String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, identity));
         Message responseForPublicKey = sendToPort(jsonInString);
-        publicInfo = Base64.decodeBase64(String.valueOf(responseForPublicKey.getObject()));
+        if (publicInfo == null) {
+            publicInfo = Base64.decodeBase64(String.valueOf(responseForPublicKey.getObject()));
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private String setEncryptQueryAndGetPrice(String query) throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
@@ -82,18 +87,18 @@ public class PP extends SocketClient {
 
     public String smartGridBillWorkFlow() {
         try {
-            getPublicKey();
-            //      Thread.sleep(100000);
-            String query = "Mike";
-            log.info("Start Encryption ");
-            String value = setEncryptQueryAndGetPrice(query);
-            Thread.sleep(10000);
-            return value;
+            boolean stepResult = getPublicKey();
+            if (stepResult) {
+                String query = "Mike";
+                log.info("Start Encryption ");
+                String value = setEncryptQueryAndGetPrice(query);
+                return value;
+            } else {
+                return null;
+            }
+
         } catch (NoSuchAlgorithmException | IOException | ClassNotFoundException e) {
             log.error("Error when Encryption", e);
-            return null;
-        } catch (InterruptedException e) {
-            e.printStackTrace();
             return null;
         }
     }
@@ -106,17 +111,21 @@ public class PP extends SocketClient {
             MessageType messageType = message.getMessageType();
             switch (messageType) {
                 case RESPONSE_FROM_TRE_ATTESTATION_REQUEST:
-                    byte[] publicKey = Base64.decodeBase64(String.valueOf(message.getObject()));
-                    String query = "Mike";
-                    log.info("Start Encryption ");
-                    try {
-                        String encryptedQuery = Utils.encrypt(query, publicKey);
-                        log.info("Send Encrypted value to TRE");
-                        ObjectMapper mapper = new ObjectMapper();
-                        String jsonInString = mapper.writeValueAsString(new Message(MessageType.GET_PRICE, encryptedQuery));
-                        return Utils.stringToMessage(jsonInString);
-                    } catch (IOException e) {
-                        log.error("{}", e);
+                    if (publicInfo == null) {
+                        publicInfo = Base64.decodeBase64(String.valueOf(message.getObject()));
+                        String query = "Mike";
+                        log.info("Start Encryption ");
+                        try {
+                            String encryptedQuery = Utils.encrypt(query, publicInfo);
+                            log.info("Send Encrypted value to TRE");
+                            ObjectMapper mapper = new ObjectMapper();
+                            String jsonInString = mapper.writeValueAsString(new Message(MessageType.GET_PRICE, encryptedQuery));
+                            return Utils.stringToMessage(jsonInString);
+                        } catch (IOException e) {
+                            log.error("{}", e);
+                        }
+                    } else {
+                        return null;
                     }
                     break;
                 case RESPONSE_FROM_TRE_GET_PRICE:

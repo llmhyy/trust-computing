@@ -14,6 +14,10 @@ public class PPStarter {
         Senario senario = Senario.get(type);
 
         PP pp = new PP("192.168.0.154", 3000, senario);
-        pp.smartGridBillWorkFlow();
+        String response = pp.smartGridBillWorkFlow();
+        // finish workflow
+        if (response != null) {
+            pp.ppServerThread.interrupt();
+        }
     }
 }
