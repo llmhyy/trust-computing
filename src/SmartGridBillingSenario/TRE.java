@@ -66,7 +66,7 @@ public class TRE extends SocketServer {
             try {
                 return Utils.decrypt(encrypteKey, privatePart);
             } catch (Exception ex) {
-                log.error("Error when decrypt Key {}", ex);
+                //log.error("Error when decrypt Key {}", ex);
                 return null;
             }
 
@@ -84,7 +84,7 @@ public class TRE extends SocketServer {
                 String identity = String.valueOf(message.getObject());
                 if (senario.equals(Senario.manInTheMiddleSenario)) {
                     try {
-                        Thread.sleep(10000);
+                        Thread.sleep(5000);
                     } catch (InterruptedException e) {
                         log.error("Error in thread: {}", e);
                     }

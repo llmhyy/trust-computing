@@ -4,6 +4,7 @@ package SmartGridBillingSenario.utils;
 import SmartGridBillingSenario.message.Message;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
@@ -20,6 +21,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 /**
  * Created by ydai on 24/9/17.
  */
+@Slf4j
 public class Utils {
 
 
@@ -47,7 +49,7 @@ public class Utils {
             // encrypt the plain text using the public key
             cipherText = cipher.doFinal(text.getBytes("UTF-8"));
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("{}", e);
         }
         return Base64.encodeBase64String(cipherText);
     }
