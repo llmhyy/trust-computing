@@ -43,6 +43,7 @@ public class ManInTheMiddle extends Pcap4j {
 
     private static final int wrongValueToPp = 888;
 
+    //TODO: One time token to client, server only accept first received token
     public ManInTheMiddle(String host, int serverPort) {
         super(host);
         this.host = host;
@@ -152,7 +153,7 @@ public class ManInTheMiddle extends Pcap4j {
             Message encryptedUser = middleManClientToPp.sendToPort(Utils.messageToString(message));
 
             String user = decryptKey(String.valueOf(encryptedUser.getObject()));
-            sendWrongValueToPp(user);
+            sendEncryptedUserToTre(user);
         } catch (Exception e) {
             log.error("Cannot send Message!! {}", e);
         }
