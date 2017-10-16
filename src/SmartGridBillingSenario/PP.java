@@ -55,7 +55,7 @@ public class PP extends SocketClient {
         String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, identity));
         Message responseForPublicKey = sendToPort(jsonInString);
         if (publicInfo == null) {
-            publicInfo = Base64.decodeBase64(String.valueOf(responseForPublicKey.getObject()));
+            setPublicInfo(Base64.decodeBase64(String.valueOf(responseForPublicKey.getObject())));
             return true;
         } else {
             return false;
@@ -112,7 +112,7 @@ public class PP extends SocketClient {
             switch (messageType) {
                 case RESPONSE_FROM_TRE_ATTESTATION_REQUEST:
                     if (publicInfo == null) {
-                        publicInfo = Base64.decodeBase64(String.valueOf(message.getObject()));
+                        setPublicInfo(Base64.decodeBase64(String.valueOf(message.getObject())));
                         String query = "Mike";
                         log.info("Start Encryption ");
                         try {
@@ -142,5 +142,10 @@ public class PP extends SocketClient {
             super(serverPort);
         }
     }
+
+    public synchronized void setPublicInfo(byte[] publicInfo) {
+        this.publicInfo = publicInfo;
+    }
+
 }
 

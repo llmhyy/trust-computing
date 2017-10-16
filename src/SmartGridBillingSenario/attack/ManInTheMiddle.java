@@ -106,8 +106,10 @@ public class ManInTheMiddle extends Pcap4j {
                     if (message.getMessageType().equals(MessageType.GET_PRICE)) {
                         String user = decryptKey(String.valueOf(message.getObject()));
                         log.info("HAHA!! Get USER from PP {}, can send this user to TRE to get response", user);
+                        ppPort = Integer.valueOf(srcPort);
                         sendEncryptedUserToTre(user);
                     } else if (message.getMessageType().equals(MessageType.ATTESTATION_REQUEST)){
+                        ppPort = Integer.valueOf(srcPort);
                         sendOwnPublicKeyToPp();
                     }
                 } catch (Exception e) {
@@ -160,6 +162,14 @@ public class ManInTheMiddle extends Pcap4j {
             middleManClientToTre = new MiddleManClient(host, trePort);
         }
 
+        //wait until public key is comming
+        while (publicKeyFromTre == null) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         String encryptedValue = Utils.encrypt(user, Base64.decodeBase64(publicKeyFromTre));
         Message message = new Message(MessageType.GET_PRICE, encryptedValue);
         try {
