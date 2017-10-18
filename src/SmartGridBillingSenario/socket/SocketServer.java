@@ -16,12 +16,14 @@ import java.net.Socket;
 @Slf4j
 public abstract class SocketServer {
 
+    private static final int maxConnection = 10;
+
     protected int port;
     private ServerSocket ss = null;
 
     public void runServer() {
         try {
-            ss = new ServerSocket(port);
+            ss = new ServerSocket(port, maxConnection);
         } catch (IOException ex) {
             log.error("IO Exception {}", ex);
         }
