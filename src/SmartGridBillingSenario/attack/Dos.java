@@ -22,7 +22,7 @@ public class Dos {
     private int portNumber;
 
     public void attack() {
-        log.info("Start dos attack,  ");
+        log.info("Start ddos attack, with threadNumber = {}", threadNumber);
         for (int i = 0; i < threadNumber; i++) {
             DdosThread thread = new DdosThread(host, portNumber);
             thread.start();
@@ -42,7 +42,7 @@ public class Dos {
         public void run() {
             while (running.get()) {
                 try {
-                    socketClient.sendToPort(Utils.messageToString(new Message(MessageType.DDOS, "")));
+                    socketClient.sendToPort(Utils.messageToString(new Message(MessageType.DDOS, "DDOS ATTACK!!!")));
                 } catch (Exception e) {
 
                 }
