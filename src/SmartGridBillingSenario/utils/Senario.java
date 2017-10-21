@@ -12,7 +12,6 @@ public enum Senario {
     WrongQuoteSenario("WrongQuoteSenario"),
     manInTheMiddleSenario("ManInTheMiddleSenario"),
     fakePPSenario("fakePPSenario"),
-    ddosPPSenario("ddosPPSenario"),
     ddosTreSenario("ddosTreSenario");
     private String senarioType;
 

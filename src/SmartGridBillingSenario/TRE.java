@@ -56,7 +56,7 @@ public class TRE extends SocketServer {
         this.senario = senario;
         tpm = TpmFactory.localTpmSimulator();
         start();
-        runServer();
+        runServer(senario);
     }
 
     private String decryptKey(String encrypteKey) {

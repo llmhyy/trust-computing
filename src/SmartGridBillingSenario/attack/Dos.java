@@ -1,6 +1,9 @@
 package SmartGridBillingSenario.attack;
 
+import SmartGridBillingSenario.message.Message;
+import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.socket.SocketClient;
+import SmartGridBillingSenario.utils.Utils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,11 +42,10 @@ public class Dos {
         public void run() {
             while (running.get()) {
                 try {
-                    socketClient.sendToPort(null);
+                    socketClient.sendToPort(Utils.messageToString(new Message(MessageType.DDOS, "")));
                 } catch (Exception e) {
 
                 }
-
 
             }
         }
