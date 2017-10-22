@@ -18,6 +18,7 @@ import tss.tpm.*;
 
 import java.util.Arrays;
 
+import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_GET_TOKEN;
 import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_TRE_ATTESTATION_REQUEST;
 import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_TRE_GET_PRICE;
 
@@ -82,8 +83,11 @@ public class TRE extends SocketServer {
         MessageType messageType = message.getMessageType();
 
         switch (messageType) {
-
-
+            case GET_TOKEN:
+                log.info("response with Token");
+                String user = String.valueOf(message.getObject());
+                String token = ppAuthentication.assignNewTokenForUser(user);
+                return new Message(RESPONSE_FROM_GET_TOKEN, token);
             //Login with PassWord And Token
             case ATTESTATION_REQUEST:
                 log.info("response with Encrypted Key");
@@ -98,13 +102,13 @@ public class TRE extends SocketServer {
                 if (ppAuthentication.checkUserPassword(identity.getUsername(), identity.getPassword()) && ppAuthentication.checkUserToken(identity.getUsername(), identity.getToken())) {
                     return new Message(RESPONSE_FROM_TRE_ATTESTATION_REQUEST, Base64.encodeBase64String(publicPart.authPolicy));
                 } else {
-                    log.error("Wrong Identity, you are fake PP!!!");
+                    log.error("Wrong Identity, you are fake PP!!! Input Identity: {}", identity);
                     return null;
                 }
             case GET_PRICE:
                 try {
-                    String user = decryptKey(String.valueOf(message.getObject()));
-                    Integer rateValue = calculator.getMemberRateMap().get(user);
+                    String checkPpUser = decryptKey(String.valueOf(message.getObject()));
+                    Integer rateValue = calculator.getMemberRateMap().get(checkPpUser);
                     log.info("Return with quote and value!");
                     if (senario.equals(Senario.NormalSenario)) {
                         return new Message(RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage(Base64.encodeBase64String(quote.toQuote()), rateValue));
