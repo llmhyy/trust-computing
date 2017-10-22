@@ -1,10 +1,12 @@
 package SmartGridBillingSenario;
 
 import SmartGridBillingSenario.calculator.Calculator;
+import SmartGridBillingSenario.message.AuthenticationMessage;
 import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketServer;
+import SmartGridBillingSenario.utils.PpAuthentication;
 import SmartGridBillingSenario.utils.Senario;
 import SmartGridBillingSenario.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -49,12 +51,13 @@ public class TRE extends SocketServer {
     //Current Calculator
     private Calculator calculator;
 
-    private String ppIdentity = "password";
+    private PpAuthentication ppAuthentication;
 
     public TRE(int serverPort, Senario senario) {
         super(serverPort);
         this.senario = senario;
         tpm = TpmFactory.localTpmSimulator();
+        ppAuthentication = new PpAuthentication();
         start();
         runServer(senario);
     }
@@ -79,9 +82,12 @@ public class TRE extends SocketServer {
         MessageType messageType = message.getMessageType();
 
         switch (messageType) {
+
+
+            //Login with PassWord And Token
             case ATTESTATION_REQUEST:
                 log.info("response with Encrypted Key");
-                String identity = String.valueOf(message.getObject());
+                AuthenticationMessage identity = AuthenticationMessage.fromMessage(message);
                 if (senario.equals(Senario.manInTheMiddleSenario)) {
                     try {
                         Thread.sleep(5000);
@@ -89,7 +95,7 @@ public class TRE extends SocketServer {
                         log.error("Error in thread: {}", e);
                     }
                 }
-                if (identity.equals(ppIdentity)) {
+                if (ppAuthentication.checkUserPassword(identity.getUsername(), identity.getPassword()) && ppAuthentication.checkUserToken(identity.getUsername(), identity.getToken())) {
                     return new Message(RESPONSE_FROM_TRE_ATTESTATION_REQUEST, Base64.encodeBase64String(publicPart.authPolicy));
                 } else {
                     log.error("Wrong Identity, you are fake PP!!!");

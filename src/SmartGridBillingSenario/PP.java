@@ -1,6 +1,7 @@
 package SmartGridBillingSenario;
 
 
+import SmartGridBillingSenario.message.AuthenticationMessage;
 import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
@@ -28,8 +29,11 @@ public class PP extends SocketClient {
 
     private Senario senario;
 
+    //Quote for TRE TPM
     private String quote = "AHv/VENHgBgAIgALMpmLnQLsp8pN1U2PmypMQb9E";
 
+    //authentication for PP
+    private String userName = "pp";
     private String identity = "password";
 
     public Thread ppServerThread;
@@ -49,10 +53,11 @@ public class PP extends SocketClient {
         ppServerThread.start();
     }
 
-    private boolean getPublicKey() throws JsonProcessingException {
+    private boolean getPublicKey(String token) throws JsonProcessingException {
         log.info("Get Public Key!!");
         ObjectMapper mapper = new ObjectMapper();
-        String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, identity));
+        AuthenticationMessage authenticationMessage = new AuthenticationMessage(token, userName, identity);
+        String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, authenticationMessage));
         Message responseForPublicKey = sendToPort(jsonInString);
         if (publicInfo == null) {
             setPublicInfo(Base64.decodeBase64(String.valueOf(responseForPublicKey.getObject())));
@@ -87,7 +92,12 @@ public class PP extends SocketClient {
 
     public String smartGridBillWorkFlow() {
         try {
-            boolean stepResult = getPublicKey();
+            String token = "";
+            if (!senario.equals(Senario.fakePPSenario)) {
+                token = getToken(userName);
+            }
+
+            boolean stepResult = getPublicKey(token);
             if (stepResult) {
                 String query = "Mike";
                 log.info("Start Encryption ");
@@ -101,6 +111,14 @@ public class PP extends SocketClient {
             log.error("Error when Encryption", e);
             return null;
         }
+    }
+
+    private String getToken(String userName) throws JsonProcessingException {
+        log.info("Get Token!!");
+        ObjectMapper mapper = new ObjectMapper();
+        String jsonInString = mapper.writeValueAsString(new Message(MessageType.GET_TOKEN, userName));
+        Message responseForToken = sendToPort(jsonInString);
+        return String.valueOf(responseForToken.getObject());
     }
 
 

@@ -6,6 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Created by ydai on 24/9/17.
  */
 public enum MessageType {
+
+    @JsonProperty("GET_TOKEN")
+    GET_TOKEN,
+    @JsonProperty("RESPONSE_FROM_GET_TOKEN")
+    RESPONSE_FROM_GET_TOKEN,
     @JsonProperty("ATTESTATION_REQUEST")
     ATTESTATION_REQUEST,
     @JsonProperty("GET_PRICE")
