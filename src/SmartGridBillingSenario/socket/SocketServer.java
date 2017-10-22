@@ -18,7 +18,7 @@ import java.util.concurrent.Semaphore;
 @Slf4j
 public abstract class SocketServer {
 
-    private static final int maxConnection = 1;
+    private static final int maxConnection = 4;
 
     //Simulate the max connection for socket server, for DDOS
     private Semaphore semaphore;
@@ -42,8 +42,8 @@ public abstract class SocketServer {
         }
         while (true) {
             try {
-                log.info("Receive Connection established, with Port = " + port);
                 Socket clientSocket = ss.accept();
+                log.info("Receive Connection established, with Port = " + clientSocket.getLocalPort());
                 if (Senario.ddosTreSenario.equals(senario)) {
                     semaphore.acquire();
                 }

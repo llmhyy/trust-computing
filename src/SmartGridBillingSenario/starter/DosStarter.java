@@ -8,7 +8,7 @@ import SmartGridBillingSenario.attack.Dos;
 public class DosStarter {
 
     public static void main(String[] args) {
-        Dos dos = new Dos(20, "192.168.0.154", 3000);
-        dos.attack();
+        Dos dos = new Dos(3, "192.168.0.154", 3000);
+        dos.startCapture();
     }
 }

@@ -5,7 +5,6 @@ import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketClient;
 import SmartGridBillingSenario.utils.Utils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.pcap4j.packet.Packet;
@@ -43,7 +42,6 @@ public class ManInTheMiddle extends Pcap4j {
 
     private static final int wrongValueToPp = 888;
 
-    //TODO: One time token to client, server only accept first received token
     public ManInTheMiddle(String host, int serverPort) {
         super(host);
         this.host = host;
@@ -135,7 +133,7 @@ public class ManInTheMiddle extends Pcap4j {
         try {
             log.info("Send own value to PP {}", message);
             middleManClientToPp.sendToPort(Utils.messageToString(message));
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             log.error("Cannot send Message!! {}", e);
         }
     }
@@ -176,7 +174,7 @@ public class ManInTheMiddle extends Pcap4j {
 
             log.info("HAHA!! Get received Quote and value from TRE {}, replace with wrong value 888, make you in trouble!!!");;
             sendWrongValueToPp(receivedQuote);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
 
             log.error("Cannot send Message!! {}", e);
         }

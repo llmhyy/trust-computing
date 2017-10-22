@@ -25,5 +25,5 @@ public enum Senario {
         return null;
     }
 
-    public static Senario currentSenario = NormalSenario;
+    public static Senario currentSenario = ddosTreSenario;
 }

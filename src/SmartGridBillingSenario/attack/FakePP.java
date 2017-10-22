@@ -6,7 +6,6 @@ import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketClient;
 import SmartGridBillingSenario.utils.Utils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -92,7 +91,7 @@ public class FakePP extends Pcap4j {
         }
 
 
-        private byte[] getPublicKey() throws JsonProcessingException {
+        private byte[] getPublicKey() throws IOException {
             log.info("Get Public Key!!");
             ObjectMapper mapper = new ObjectMapper();
             String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, authenticationMessage));

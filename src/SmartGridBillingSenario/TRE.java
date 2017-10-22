@@ -18,9 +18,7 @@ import tss.tpm.*;
 
 import java.util.Arrays;
 
-import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_GET_TOKEN;
-import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_TRE_ATTESTATION_REQUEST;
-import static SmartGridBillingSenario.message.MessageType.RESPONSE_FROM_TRE_GET_PRICE;
+import static SmartGridBillingSenario.message.MessageType.*;
 
 /**
  * Created by ydai on 24/9/17.
@@ -118,6 +116,8 @@ public class TRE extends SocketServer {
                 } catch (Exception e) {
                     log.error("Error when parse data, {}", message.getObject());
                 }
+            case  DDOS:
+                return new Message(DDOS, "");
         }
         return null;
     }

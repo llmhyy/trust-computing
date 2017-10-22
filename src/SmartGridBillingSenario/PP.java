@@ -9,13 +9,13 @@ import SmartGridBillingSenario.socket.SocketClient;
 import SmartGridBillingSenario.socket.SocketServer;
 import SmartGridBillingSenario.utils.Senario;
 import SmartGridBillingSenario.utils.Utils;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
+import java.io.*;
+import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.util.Map;
 
@@ -53,12 +53,21 @@ public class PP extends SocketClient {
         ppServerThread.start();
     }
 
-    private boolean getPublicKey(String token) throws JsonProcessingException {
+    private boolean getPublicKey(String token) throws IOException {
         log.info("Get Public Key!!");
         ObjectMapper mapper = new ObjectMapper();
         AuthenticationMessage authenticationMessage = new AuthenticationMessage(token, userName, identity);
         String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, authenticationMessage));
+
+        //Assign connection Timeout for 5s for response
+        long startTime = System.currentTimeMillis();
         Message responseForPublicKey = sendToPort(jsonInString);
+        long elapsed = System.currentTimeMillis() - startTime;
+        if (elapsed >= 1000) {
+            log.info("Face DDOS attack. connection timeout, close connection");
+            return false;
+        }
+
         if (publicInfo == null) {
             setPublicInfo(Base64.decodeBase64(String.valueOf(responseForPublicKey.getObject())));
             return true;
@@ -97,6 +106,22 @@ public class PP extends SocketClient {
                 token = getToken(userName);
             }
 
+            if (senario.equals(Senario.ddosTreSenario)) {
+                client.close();
+                try {
+                    Thread.sleep(5000);
+                } catch (Exception ex) {
+
+                }
+                client = new Socket(serverHost, serverPort);
+                clientPort = client.getLocalPort();
+                OutputStream outToServer = client.getOutputStream();
+
+                out = new ObjectOutputStream(outToServer);
+
+                InputStream inFromServer = client.getInputStream();
+                in = new ObjectInputStream(inFromServer);
+            }
             boolean stepResult = getPublicKey(token);
             if (stepResult) {
                 String query = "Mike";
@@ -113,7 +138,7 @@ public class PP extends SocketClient {
         }
     }
 
-    private String getToken(String userName) throws JsonProcessingException {
+    private String getToken(String userName) throws IOException {
         log.info("Get Token!!");
         ObjectMapper mapper = new ObjectMapper();
         String jsonInString = mapper.writeValueAsString(new Message(MessageType.GET_TOKEN, userName));
