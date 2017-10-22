@@ -106,7 +106,6 @@ public class Dos extends Pcap4j {
                 try {
                     socketClient.sendToPort(Utils.messageToString(new Message(MessageType.DDOS, "DDOS ATTACK!!!")));
                 } catch (Exception e) {
-                    e.printStackTrace();
                 }
 
             }

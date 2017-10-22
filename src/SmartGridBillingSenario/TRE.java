@@ -116,8 +116,6 @@ public class TRE extends SocketServer {
                 } catch (Exception e) {
                     log.error("Error when parse data, {}", message.getObject());
                 }
-            case  DDOS:
-                return new Message(DDOS, "");
         }
         return null;
     }
