@@ -2,6 +2,7 @@ package SmartGridBillingSenario.utils;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class PpAuthentication {
 
     public boolean checkUserToken(String user, String token) {
         //if token == null means this system does not use token, for fake PP Attack, return true
-        if (token == null) {
+        if (StringUtils.isEmpty(token)) {
             return true;
         }
 

@@ -9,9 +9,8 @@ import SmartGridBillingSenario.utils.Senario;
 public class PPStarter {
 
     public static void main(String[] args) {
-        String type = "NormalSenario";
 
-        Senario senario = Senario.get(type);
+        Senario senario = Senario.currentSenario;
 
         PP pp = new PP("192.168.0.154", 3000, senario);
         String response = pp.smartGridBillWorkFlow();

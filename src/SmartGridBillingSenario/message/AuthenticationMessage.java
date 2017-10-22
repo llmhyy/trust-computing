@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
  */
 @Getter
 @EqualsAndHashCode
+@ToString
 public class AuthenticationMessage implements Serializable {
 
     @JsonProperty("token")

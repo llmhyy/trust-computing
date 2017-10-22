@@ -10,8 +10,7 @@ public class TREStarter {
 
     public static void main(String[] args) {
 
-        String type = "ddosTreSenario";
-        Senario senario = Senario.get(type);
+        Senario senario = Senario.currentSenario;
 
         TRE tre = new TRE(3000, senario);
     }

