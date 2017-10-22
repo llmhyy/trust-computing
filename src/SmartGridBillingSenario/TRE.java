@@ -110,12 +110,11 @@ public class TRE extends SocketServer {
                     String checkPpUser = decryptKey(String.valueOf(message.getObject()));
                     Integer rateValue = calculator.getMemberRateMap().get(checkPpUser);
                     log.info("Return with quote and value!");
-                    if (senario.equals(Senario.NormalSenario)) {
-                        return new Message(RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage(Base64.encodeBase64String(quote.toQuote()), rateValue));
-                    } else if (senario.equals(Senario.WrongQuoteSenario)) {
+                    if (senario.equals(Senario.WrongQuoteSenario)) {
                         return new Message(RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage("1", rateValue));
+                    } else {
+                        return new Message(RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage(Base64.encodeBase64String(quote.toQuote()), rateValue));
                     }
-
                 } catch (Exception e) {
                     log.error("Error when parse data, {}", message.getObject());
                 }
