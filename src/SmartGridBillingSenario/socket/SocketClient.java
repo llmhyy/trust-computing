@@ -52,7 +52,6 @@ public class SocketClient {
             String returnMessageString = (String) in.readObject();
             ObjectMapper mapper = new ObjectMapper();
             Message returnMessage = mapper.readValue(returnMessageString, Message.class);
-            log.info("SocketServer return {}", returnMessage);
             return returnMessage;
         } catch (ClassNotFoundException e) {
             log.error("Parse Class Not Found Example: {}", e);
