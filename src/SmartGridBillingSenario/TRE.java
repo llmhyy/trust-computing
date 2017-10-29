@@ -7,6 +7,7 @@ import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketServer;
 import SmartGridBillingSenario.utils.PpAuthentication;
+import SmartGridBillingSenario.utils.PropertyReader;
 import SmartGridBillingSenario.utils.Senario;
 import SmartGridBillingSenario.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,9 @@ public class TRE extends SocketServer {
     public TRE(int serverPort, Senario senario) {
         super(serverPort);
         this.senario = senario;
-        tpm = TpmFactory.localTpmSimulator();
+        String tpmHost = PropertyReader.getProperty("tpm.ip");
+        String tpmPort = PropertyReader.getProperty("tpm.port");
+        tpm = TpmFactory.localTpmSimulator(tpmHost, Integer.valueOf(tpmPort));
         ppAuthentication = new PpAuthentication();
         start();
         runServer(senario);
@@ -131,7 +134,6 @@ public class TRE extends SocketServer {
         createAik();
         log.info("Sign New Quote");
         calculator = new Calculator();
-
         signNewData(Utils.getByteArrayOfClass(calculator.getClass()));
     }
 

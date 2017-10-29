@@ -18,7 +18,7 @@ public class TpmFactory {
      */
     public static Tpm localTpmSimulator(String host, Integer port) {
         Tpm tpm = new Tpm();
-        TpmDeviceBase device = new TpmDeviceTcp("192.168.56.101", 2321);
+        TpmDeviceBase device = new TpmDeviceTcp(host, port);
         device.powerCycle();
         tpm = new Tpm();
         tpm._setDevice(device);

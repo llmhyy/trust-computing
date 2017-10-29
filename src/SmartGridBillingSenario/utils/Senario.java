@@ -1,6 +1,7 @@
 package SmartGridBillingSenario.utils;
 
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Created by ydai on 8/10/17.
@@ -25,5 +26,10 @@ public enum Senario {
         return null;
     }
 
-    public static Senario currentSenario = ddosTreSenario;
+    public static Senario currentSenario = getCurrentSenario();
+
+    private static Senario getCurrentSenario() {
+        String senarioString = PropertyReader.getProperty("senario");
+        return StringUtils.isEmpty(senarioString) ? NormalSenario : get(senarioString);
+    }
 }

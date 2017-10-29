@@ -1,6 +1,7 @@
 package SmartGridBillingSenario.starter;
 
 import SmartGridBillingSenario.attack.ManInTheMiddle;
+import SmartGridBillingSenario.utils.PropertyReader;
 
 /**
  * Created by ydai on 15/10/17.
@@ -8,7 +9,10 @@ import SmartGridBillingSenario.attack.ManInTheMiddle;
 public class MainInTheMiddleStarter {
 
     public static void main(String[] args) {
-        ManInTheMiddle mainInTheMiddle = new ManInTheMiddle("192.168.0.154", 3000);
+
+        String treIp = PropertyReader.getProperty("tre.ip");
+        String trePort = PropertyReader.getProperty("tre.port");
+        ManInTheMiddle mainInTheMiddle = new ManInTheMiddle(treIp, Integer.valueOf(trePort));
         mainInTheMiddle.startCapture();
     }
 }

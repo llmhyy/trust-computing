@@ -1,6 +1,7 @@
 package SmartGridBillingSenario.starter;
 
 import SmartGridBillingSenario.PP;
+import SmartGridBillingSenario.utils.PropertyReader;
 import SmartGridBillingSenario.utils.Senario;
 
 /**
@@ -12,7 +13,10 @@ public class PPStarter {
 
         Senario senario = Senario.currentSenario;
 
-        PP pp = new PP("192.168.0.154", 3000, senario);
+        String treIp = PropertyReader.getProperty("tre.ip");
+        String trePort = PropertyReader.getProperty("tre.port");
+
+        PP pp = new PP(treIp, Integer.valueOf(trePort), senario);
         String response = pp.smartGridBillWorkFlow();
         // finish workflow
         if (response != null) {
