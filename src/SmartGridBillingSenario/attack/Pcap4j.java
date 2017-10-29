@@ -124,11 +124,11 @@ public abstract class Pcap4j {
         try {
             List<String> deviceNameList = Pcaps.findAllDevs().stream().map(inteface -> inteface.getName()).collect(Collectors.toList());
             log.info("All available devices for PCap is Here!!!");
-            for (String deviceName: deviceNameList) {
+            for (String deviceName : deviceNameList) {
                 log.info("DeviceName: {}", deviceName);
             }
         } catch (PcapNativeException e) {
-           log.error("Cannot list out all devices, {}", e);
+            log.error("Cannot list out all devices, {}", e);
             return "";
         }
         System.out.println("Enter your device Name: ");

@@ -2,7 +2,7 @@ package tss.tpm;
 
 import tss.*;
 
-import java.util.Arrays;
+import java.security.NoSuchAlgorithmException;
 
 
 // -----------This is an auto-generated file: do not edit
@@ -88,10 +88,10 @@ public class QuoteResponse extends TpmStructure {
         return;
     }
 
-    public byte[] toQuote() {
+    public byte[] toQuote() throws NoSuchAlgorithmException {
         OutByteBuf buf = new OutByteBuf();
         toTpm(buf);
-        return Arrays.copyOf(buf.getBuf(), 30);
+        return buf.getQuote();
     }
 
     @Override
