@@ -8,7 +8,7 @@ import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketClient;
 import SmartGridBillingSenario.socket.SocketServer;
-import SmartGridBillingSenario.utils.Senario;
+import SmartGridBillingSenario.utils.Scenario;
 import SmartGridBillingSenario.utils.Utils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class PP extends SocketClient {
 
     private transient byte[] publicInfo;
 
-    private Senario senario;
+    private Scenario senario;
 
     //Quote for TRE TPM
     //private String quote = "AHv/VENHgBgAIgALMpmLnQLsp8pN1U2PmypMQb9E";
@@ -39,7 +39,7 @@ public class PP extends SocketClient {
 
     public Thread ppServerThread;
 
-    public PP(String host, int port, Senario senario) {
+    public PP(String host, int port, Scenario senario) {
         super(host, port);
         this.senario = senario;
 
@@ -106,11 +106,11 @@ public class PP extends SocketClient {
     public String smartGridBillWorkFlow() {
         try {
             String token = "";
-            if (!senario.equals(Senario.fakePPSenario)) {
+            if (!senario.equals(Scenario.fakePPScenario)) {
                 token = getToken(userName);
             }
 
-            if (senario.equals(Senario.ddosTreSenario)) {
+            if (senario.equals(Scenario.ddosTreScenario)) {
                 client.close();
                 try {
                     Thread.sleep(5000);

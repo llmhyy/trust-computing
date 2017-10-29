@@ -8,7 +8,7 @@ import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketServer;
 import SmartGridBillingSenario.utils.PpAuthentication;
 import SmartGridBillingSenario.utils.PropertyReader;
-import SmartGridBillingSenario.utils.Senario;
+import SmartGridBillingSenario.utils.Scenario;
 import SmartGridBillingSenario.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
@@ -45,15 +45,15 @@ public class TRE extends SocketServer {
     public byte[] privatePart;
     public transient TPMT_PUBLIC publicPart;
 
-    //Current Senario
-    private Senario senario;
+    //Current Scenario
+    private Scenario senario;
 
     //Current Calculator
     private Calculator calculator;
 
     private PpAuthentication ppAuthentication;
 
-    public TRE(int serverPort, Senario senario) {
+    public TRE(int serverPort, Scenario senario) {
         super(serverPort);
         this.senario = senario;
         String tpmHost = PropertyReader.getProperty("tpm.ip");
@@ -93,7 +93,7 @@ public class TRE extends SocketServer {
             case ATTESTATION_REQUEST:
                 log.info("response with Encrypted Key");
                 AuthenticationMessage identity = AuthenticationMessage.fromMessage(message);
-                if (senario.equals(Senario.manInTheMiddleSenario)) {
+                if (senario.equals(Scenario.manInTheMiddleSenario)) {
                     try {
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
@@ -111,7 +111,7 @@ public class TRE extends SocketServer {
                     String checkPpUser = decryptKey(String.valueOf(message.getObject()));
                     Integer rateValue = calculator.getMemberRateMap().get(checkPpUser);
                     log.info("Return with quote and value!");
-                    if (senario.equals(Senario.WrongQuoteSenario)) {
+                    if (senario.equals(Scenario.WrongQuoteSenario)) {
                         return new Message(RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage("1", rateValue));
                     } else {
                         return new Message(RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage(Base64.encodeBase64String(quote.toQuote()), rateValue));

@@ -21,7 +21,7 @@ public class Message implements Serializable {
     private Object object;
 
     @JsonCreator
-    public Message(@JsonProperty("messageType")MessageType messageType,  @JsonProperty("object")Object object) {
+    public Message(@JsonProperty("messageType") MessageType messageType, @JsonProperty("object") Object object) {
         this.messageType = messageType;
         this.object = object;
     }

@@ -2,7 +2,7 @@ package SmartGridBillingSenario.starter;
 
 import SmartGridBillingSenario.PP;
 import SmartGridBillingSenario.utils.PropertyReader;
-import SmartGridBillingSenario.utils.Senario;
+import SmartGridBillingSenario.utils.Scenario;
 
 /**
  * Created by yuandai on 28/9/17.
@@ -11,7 +11,7 @@ public class PPStarter {
 
     public static void main(String[] args) {
 
-        Senario senario = Senario.currentSenario;
+        Scenario senario = Scenario.currentSenario;
 
         String treIp = PropertyReader.getProperty("tre.ip");
         String trePort = PropertyReader.getProperty("tre.port");

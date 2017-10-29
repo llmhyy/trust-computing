@@ -1,7 +1,7 @@
 package SmartGridBillingSenario.starter;
 
 import SmartGridBillingSenario.utils.PropertyReader;
-import SmartGridBillingSenario.utils.Senario;
+import SmartGridBillingSenario.utils.Scenario;
 import SmartGridBillingSenario.TRE;
 
 /**
@@ -11,10 +11,10 @@ public class TREStarter {
 
     public static void main(String[] args) {
 
-        Senario senario = Senario.currentSenario;
+        Scenario senario = Scenario.currentSenario;
 
         String trePort = PropertyReader.getProperty("tre.port");
 
-        TRE tre = new TRE(Integer.valueOf(trePort), senario);
+        new TRE(Integer.valueOf(trePort), senario);
     }
 }

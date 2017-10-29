@@ -1,7 +1,7 @@
 package SmartGridBillingSenario.socket;
 
 import SmartGridBillingSenario.message.Message;
-import SmartGridBillingSenario.utils.Senario;
+import SmartGridBillingSenario.utils.Scenario;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,17 +23,17 @@ public abstract class SocketServer {
     //Simulate the max connection for socket server, for DDOS
     private Semaphore semaphore;
 
-    private Senario senario;
+    private Scenario senario;
 
     protected int port;
     private ServerSocket ss = null;
 
 
     public void runServer() {
-        runServer(Senario.NormalSenario);
+        runServer(Scenario.NormalScenario);
     }
 
-    public void runServer(Senario senario) {
+    public void runServer(Scenario senario) {
         try {
             this.senario = senario;
             ss = new ServerSocket(port, maxConnection);
@@ -44,7 +44,7 @@ public abstract class SocketServer {
             try {
                 Socket clientSocket = ss.accept();
                 log.info("Receive Connection established, with Port = " + clientSocket.getLocalPort());
-                if (Senario.ddosTreSenario.equals(senario)) {
+                if (Scenario.ddosTreScenario.equals(senario)) {
                     semaphore.acquire();
                 }
                 new SocketServerThread(clientSocket).start();
@@ -78,7 +78,7 @@ public abstract class SocketServer {
 
         @Override
         public void interrupt() {
-            if (Senario.ddosTreSenario.equals(senario)) {
+            if (Scenario.ddosTreScenario.equals(senario)) {
                 semaphore.release();
             }
             super.interrupt();

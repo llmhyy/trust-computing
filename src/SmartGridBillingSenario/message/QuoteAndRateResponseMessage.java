@@ -10,7 +10,7 @@ import java.io.Serializable;
  * Created by ydai on 8/10/17.
  */
 @Getter
-public class QuoteAndRateResponseMessage extends Object implements Serializable{
+public class QuoteAndRateResponseMessage extends Object implements Serializable {
     @JsonProperty("quote")
     private String quote;
 
@@ -18,7 +18,7 @@ public class QuoteAndRateResponseMessage extends Object implements Serializable{
     private Integer rateValue;
 
     @JsonCreator
-    public QuoteAndRateResponseMessage(@JsonProperty("quote")String quote,  @JsonProperty("rateValue")Integer rateValue) {
+    public QuoteAndRateResponseMessage(@JsonProperty("quote") String quote, @JsonProperty("rateValue") Integer rateValue) {
         this.quote = quote;
         this.rateValue = rateValue;
     }

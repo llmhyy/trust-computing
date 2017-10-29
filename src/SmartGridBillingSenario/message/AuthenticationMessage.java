@@ -27,7 +27,7 @@ public class AuthenticationMessage implements Serializable {
     private String password;
 
     @JsonCreator
-    public AuthenticationMessage(@JsonProperty("token")String token, @JsonProperty("username") String username, @JsonProperty("password")String password) {
+    public AuthenticationMessage(@JsonProperty("token") String token, @JsonProperty("username") String username, @JsonProperty("password") String password) {
         this.token = token;
         this.username = username;
         this.password = password;

@@ -25,6 +25,7 @@ public class PpAuthentication {
 
     /**
      * Init the UserName/Password for new user
+     *
      * @return
      */
     private Map<String, String> generateUserPasswordMap() {
@@ -37,6 +38,7 @@ public class PpAuthentication {
 
     /**
      * Check input user/password match system or not
+     *
      * @param user
      * @param inputPassword
      * @return
@@ -48,6 +50,7 @@ public class PpAuthentication {
 
     /**
      * Assign new Token for new User
+     *
      * @param user
      * @return
      */
@@ -74,6 +77,7 @@ public class PpAuthentication {
 
     /**
      * Random Token for six digit
+     *
      * @return
      */
     private String generateRandomToken() {
