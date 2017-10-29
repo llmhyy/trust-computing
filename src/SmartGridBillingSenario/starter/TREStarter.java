@@ -11,10 +11,10 @@ public class TREStarter {
 
     public static void main(String[] args) {
 
-        Scenario senario = Scenario.currentSenario;
+        Scenario scenario = Scenario.currentScenario;
 
         String trePort = PropertyReader.getProperty("tre.port");
 
-        new TRE(Integer.valueOf(trePort), senario);
+        new TRE(Integer.valueOf(trePort), scenario);
     }
 }
