@@ -93,7 +93,7 @@ public class TRE extends SocketServer {
             case ATTESTATION_REQUEST:
                 log.info("response with Encrypted Key");
                 AuthenticationMessage identity = AuthenticationMessage.fromMessage(message);
-                if (senario.equals(Scenario.manInTheMiddleSenario)) {
+                if (senario.equals(Scenario.manInTheMiddleScenario)) {
                     try {
                         Thread.sleep(5000);
                     } catch (InterruptedException e) {
@@ -111,7 +111,7 @@ public class TRE extends SocketServer {
                     String checkPpUser = decryptKey(String.valueOf(message.getObject()));
                     Integer rateValue = calculator.getMemberRateMap().get(checkPpUser);
                     log.info("Return with quote and value!");
-                    if (senario.equals(Scenario.WrongQuoteSenario)) {
+                    if (senario.equals(Scenario.WrongQuoteScenario)) {
                         return new Message(RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage("1", rateValue));
                     } else {
                         return new Message(RESPONSE_FROM_TRE_GET_PRICE, new QuoteAndRateResponseMessage(Base64.encodeBase64String(quote.toQuote()), rateValue));
