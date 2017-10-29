@@ -28,7 +28,7 @@ public class PP extends SocketClient {
 
     private transient byte[] publicInfo;
 
-    private Scenario senario;
+    private Scenario scenario;
 
     //Quote for TRE TPM
     //private String quote = "AHv/VENHgBgAIgALMpmLnQLsp8pN1U2PmypMQb9E";
@@ -39,9 +39,9 @@ public class PP extends SocketClient {
 
     public Thread ppServerThread;
 
-    public PP(String host, int port, Scenario senario) {
+    public PP(String host, int port, Scenario scenario) {
         super(host, port);
-        this.senario = senario;
+        this.scenario = scenario;
 
 
         ppServerThread = new Thread() {
@@ -106,11 +106,11 @@ public class PP extends SocketClient {
     public String smartGridBillWorkFlow() {
         try {
             String token = "";
-            if (!senario.equals(Scenario.fakePPScenario)) {
+            if (!scenario.equals(Scenario.fakePPScenario)) {
                 token = getToken(userName);
             }
 
-            if (senario.equals(Scenario.ddosTreScenario)) {
+            if (scenario.equals(Scenario.ddosTreScenario)) {
                 client.close();
                 try {
                     Thread.sleep(5000);

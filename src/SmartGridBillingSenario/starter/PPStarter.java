@@ -11,12 +11,12 @@ public class PPStarter {
 
     public static void main(String[] args) {
 
-        Scenario senario = Scenario.currentSenario;
+        Scenario scenario = Scenario.currentScenario;
 
         String treIp = PropertyReader.getProperty("tre.ip");
         String trePort = PropertyReader.getProperty("tre.port");
 
-        PP pp = new PP(treIp, Integer.valueOf(trePort), senario);
+        PP pp = new PP(treIp, Integer.valueOf(trePort), scenario);
         String response = pp.smartGridBillWorkFlow();
         // finish workflow
         if (response != null) {

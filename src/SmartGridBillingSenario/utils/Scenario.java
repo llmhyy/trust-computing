@@ -9,11 +9,11 @@ import org.apache.commons.lang3.StringUtils;
 
 @AllArgsConstructor
 public enum Scenario {
-    NormalScenario("NormalSenario"),
-    WrongQuoteScenario("WrongQuoteSenario"),
-    manInTheMiddleScenario("ManInTheMiddleSenario"),
-    fakePPScenario("fakePPSenario"),
-    ddosTreScenario("ddosTreSenario");
+    NormalScenario("NormalScenario"),
+    WrongQuoteScenario("WrongQuoteScenario"),
+    manInTheMiddleScenario("ManInTheMiddleScenario"),
+    fakePPScenario("fakePPScenario"),
+    ddosTreScenario("ddosTreScenario");
     private String scenarioType;
 
 
@@ -26,9 +26,9 @@ public enum Scenario {
         return null;
     }
 
-    public static Scenario currentSenario = getCurrentSenario();
+    public static Scenario currentScenario = getCurrentScenario();
 
-    private static Scenario getCurrentSenario() {
+    private static Scenario getCurrentScenario() {
         String scenarioString = PropertyReader.getProperty("scenario");
         return StringUtils.isEmpty(scenarioString) ? NormalScenario : get(scenarioString);
     }
