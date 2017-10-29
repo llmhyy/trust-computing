@@ -1,6 +1,8 @@
 package SmartGridBillingSenario.attack;
 
+import SmartGridBillingSenario.utils.PropertyReader;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.pcap4j.core.*;
 import org.pcap4j.packet.BsdLoopbackPacket;
 import org.pcap4j.packet.IpV4Packet;
@@ -8,15 +10,16 @@ import org.pcap4j.packet.Packet;
 import org.pcap4j.packet.TcpPacket;
 
 import java.io.EOFException;
+import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
 /**
  * Created by ydai on 12/10/17.
  */
 @Slf4j
 public abstract class Pcap4j {
-
-    private static final String networkInterfaceName = "lo0";
 
     private static int snaplen = 1024 * 1024;
 
@@ -85,6 +88,12 @@ public abstract class Pcap4j {
     public abstract void handleTcpData(String srcAddr, String dstAddr, String srcPort, String dstPort, Packet payload);
 
     private PcapHandle openPcap() {
+
+        String networkInterfaceName = PropertyReader.getProperty("networkInterfaceName");
+
+        if (StringUtils.isEmpty(networkInterfaceName)) {
+            networkInterfaceName = getInterfaceNameFromConsole();
+        }
         try {
             PcapNetworkInterface nif = Pcaps.getDevByName(networkInterfaceName);
             if (nif == null) {
@@ -110,5 +119,23 @@ public abstract class Pcap4j {
         }
     }
 
+    private String getInterfaceNameFromConsole() {
+
+        try {
+            List<String> deviceNameList = Pcaps.findAllDevs().stream().map(inteface -> inteface.getName()).collect(Collectors.toList());
+            log.info("All available devices for PCap is Here!!!");
+            for (String deviceName: deviceNameList) {
+                log.info("DeviceName: {}", deviceName);
+            }
+        } catch (PcapNativeException e) {
+           log.error("Cannot list out all devices, {}", e);
+            return "";
+        }
+        System.out.println("Enter your device Name: ");
+        Scanner scanner = new Scanner(System.in);
+        String deviceName = scanner.nextLine();
+        System.out.println("Your device is " + deviceName);
+        return deviceName;
+    }
 
 }
