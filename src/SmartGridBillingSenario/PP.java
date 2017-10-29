@@ -1,6 +1,7 @@
 package SmartGridBillingSenario;
 
 
+import SmartGridBillingSenario.calculator.Calculator;
 import SmartGridBillingSenario.message.AuthenticationMessage;
 import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.message.MessageType;
@@ -30,7 +31,7 @@ public class PP extends SocketClient {
     private Senario senario;
 
     //Quote for TRE TPM
-    private String quote = "AHv/VENHgBgAIgALMpmLnQLsp8pN1U2PmypMQb9E";
+    //private String quote = "AHv/VENHgBgAIgALMpmLnQLsp8pN1U2PmypMQb9E";
 
     //authentication for PP
     private String userName = "pp";
@@ -86,6 +87,9 @@ public class PP extends SocketClient {
             Map<String, Object> result = (Map<String, Object>) sendToPort(jsonInString).getObject();
             QuoteAndRateResponseMessage quoteAndRateResponseMessage = new QuoteAndRateResponseMessage(String.valueOf(result.get("quote")), Integer.valueOf(String.valueOf(result.get("rateValue"))));
             String receivedQuote = quoteAndRateResponseMessage.getQuote();
+
+            byte[] quoteByte = Utils.getByteArrayOfClass(Calculator.class);
+            String quote = Base64.encodeBase64String(Utils.shaHashing(quoteByte, new byte[]{0}));
 
             if (receivedQuote.equals(quote)) {
                 log.info("Great!! Rate Value for user: {} is {}", query, quoteAndRateResponseMessage.getRateValue());

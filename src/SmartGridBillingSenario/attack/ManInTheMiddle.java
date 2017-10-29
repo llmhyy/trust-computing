@@ -151,7 +151,7 @@ public class ManInTheMiddle extends Pcap4j {
             Message encryptedUser = middleManClientToPp.sendToPort(Utils.messageToString(message));
 
             String user = decryptKey(String.valueOf(encryptedUser.getObject()));
-            sendEncryptedUserToTre(user);
+            sendWrongValueToPp(user);
         } catch (Exception e) {
             log.error("Cannot send Message!! {}", e);
         }

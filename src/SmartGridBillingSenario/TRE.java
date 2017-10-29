@@ -158,10 +158,10 @@ public class TRE extends SocketServer {
         System.out.println("RSA Primary quoting Key: \n" + quotingKey.toString());
 
         // Set some PCR to non-zero values
-        tpm.PCR_Event(TPM_HANDLE.pcr(10), new byte[]{0, 1, 2});
+        tpm.PCR_Event(TPM_HANDLE.pcr(0), new byte[]{0});
 
         pcrToQuote = new TPMS_PCR_SELECTION[]{
-                new TPMS_PCR_SELECTION(TPM_ALG_ID.SHA256, new int[]{10})};
+                new TPMS_PCR_SELECTION(TPM_ALG_ID.SHA256, new int[]{0})};
     }
 
     private void initTpm() {

@@ -8,12 +8,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.ArrayUtils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -143,5 +146,12 @@ public class Utils {
 
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(message);
+    }
+
+    public static byte[] shaHashing(byte[] input, byte[] currentQuote) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        md.update(input);
+        byte byteData[] = md.digest();
+        return ArrayUtils.addAll(currentQuote, byteData);
     }
 }
