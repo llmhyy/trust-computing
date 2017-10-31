@@ -9,7 +9,7 @@ import SmartGridBillingSenario.utils.Scenario;
  */
 public class PPStarter {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchMethodException {
 
         Scenario scenario = Scenario.currentScenario;
 

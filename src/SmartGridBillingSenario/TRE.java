@@ -6,10 +6,7 @@ import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.message.MessageType;
 import SmartGridBillingSenario.message.QuoteAndRateResponseMessage;
 import SmartGridBillingSenario.socket.SocketServer;
-import SmartGridBillingSenario.utils.PpAuthentication;
-import SmartGridBillingSenario.utils.PropertyReader;
-import SmartGridBillingSenario.utils.Scenario;
-import SmartGridBillingSenario.utils.Utils;
+import SmartGridBillingSenario.utils.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import tss.Tpm;
@@ -53,7 +50,7 @@ public class TRE extends SocketServer {
 
     private PpAuthentication ppAuthentication;
 
-    public TRE(int serverPort, Scenario scenario) {
+    public TRE(int serverPort, Scenario scenario) throws NoSuchMethodException {
         super(serverPort);
         this.scenario = scenario;
         String tpmHost = PropertyReader.getProperty("tpm.ip");
@@ -126,7 +123,7 @@ public class TRE extends SocketServer {
     /**
      * TRE create AIK by its EK (see tutorial)
      */
-    public void start() {
+    public void start() throws NoSuchMethodException {
         initTpm();
         ek = createEK();
         initQuote();
@@ -134,7 +131,12 @@ public class TRE extends SocketServer {
         createAik();
         log.info("Sign New Quote");
         calculator = new Calculator();
-        signNewData(Utils.getByteArrayOfClass(calculator.getClass()));
+        calculator.initMemberRateProcessor();
+        byte[] codeArray1 = Utils.getMethodQuoteCode(calculator.getClass(), "initMemberRateProcessor");
+        signNewData(codeArray1);
+        calculator.initMemberRateMap();
+        byte[] codeArray2 = Utils.getMethodQuoteCode(calculator.getClass(), "initMemberRateMap");
+        signNewData(codeArray2);
     }
 
     private void initQuote() {
@@ -173,8 +175,6 @@ public class TRE extends SocketServer {
             System.out.println("No dangling handles");
         else for (TPM_HANDLE h : handles.handle)
             System.out.printf("Dangling handle 0x%08X\n", h.handle);
-
-
     }
 
 
@@ -199,15 +199,15 @@ public class TRE extends SocketServer {
         // Use the helper routines in tss.Java to create a duplication
         // blob *without* using the TPM
         rsaEKTemplate = new TPMT_PUBLIC(
-                TPM_ALG_ID.SHA1,
+                TPM_ALG_ID.RSA,
                 new TPMA_OBJECT(TPMA_OBJECT.userWithAuth, TPMA_OBJECT.sign),
                 new byte[0],
                 new TPMS_ECC_PARMS(
                         TPMT_SYM_DEF_OBJECT.nullObject(),
-                        new TPMS_SIG_SCHEME_ECDSA(TPM_ALG_ID.SHA1),
+                        new TPMS_SIG_SCHEME_ECDSA(TPM_ALG_ID.RSA),
                         TPM_ECC_CURVE.NIST_P256,
                         new TPMS_NULL_KDF_SCHEME()),
-                new TPMS_ECC_POINT());
+                new TPM2B_PUBLIC_KEY_RSA());
         return rsaEk;
     }
 

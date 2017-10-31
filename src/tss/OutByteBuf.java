@@ -5,7 +5,6 @@ import SmartGridBillingSenario.utils.Utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 
 public class OutByteBuf {
     ByteArrayOutputStream s;
@@ -109,8 +108,8 @@ public class OutByteBuf {
         write(x);
     }
 
-    public byte[] getQuote() throws NoSuchAlgorithmException {
-        return Utils.shaHashing(Utils.getByteArrayOfClass(Calculator.class), new byte[]{0});
+    public byte[] getQuote() throws Exception {
+        return Utils.shaHashing(Utils.getMethodQuoteCode(Calculator.class, "initMemberRateProcessor"), Utils.getMethodQuoteCode(Calculator.class, "initMemberRateMap"));
     }
 
     public void writeArray(short[] x) {

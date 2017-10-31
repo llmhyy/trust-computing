@@ -1,13 +1,19 @@
 package SmartGridBillingSenario.calculator;
 
+import SmartGridBillingSenario.utils.MethodQuoteCode;
+import lombok.NoArgsConstructor;
 import org.apache.commons.collections.MapUtils;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * Created by ydai on 8/10/17.
  */
+@NoArgsConstructor
 public class Calculator {
 
     private static final Integer rate = 10; // rate per degree
@@ -16,13 +22,8 @@ public class Calculator {
 
     private Map<String, List<Integer>> memberRateProcessor = new HashMap<>();
 
-    public Calculator() {
-        initMemberRateProcessor();
-        initMemberRateMap();
-    }
-
-
-    private void initMemberRateProcessor() {
+    @MethodQuoteCode(code = "initMemberRateProcessorReal")
+    public void initMemberRateProcessor() {
         // first member Mile
         String mike = "Mike";
         List<Integer> mikeSevenDayUsage = Arrays.asList(1, 2, 3, 4, 5, 6, 7);
@@ -44,7 +45,8 @@ public class Calculator {
         memberRateProcessor.put(nick, nickSevenDayUsage);
     }
 
-    private void initMemberRateMap() {
+    @MethodQuoteCode(code = "initMemberRateMapReal")
+    public void initMemberRateMap() {
 
         if (MapUtils.isNotEmpty(memberRateProcessor)) {
             memberRateMap = memberRateProcessor.entrySet().parallelStream().collect(Collectors.toMap(x -> x.getKey(), y -> calculateRate(y.getValue())));

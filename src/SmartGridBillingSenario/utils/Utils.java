@@ -154,4 +154,9 @@ public class Utils {
         byte byteData[] = md.digest();
         return ArrayUtils.addAll(currentQuote, byteData);
     }
+
+    public static byte[] getMethodQuoteCode(Class clazz, String methodName) throws NoSuchMethodException {
+        log.info("Get Code for clazz {}, method: {}", clazz.getName(), methodName);
+        return clazz.getMethod(methodName, null).getAnnotation(MethodQuoteCode.class).code().getBytes();
+    }
 }

@@ -9,7 +9,7 @@ import SmartGridBillingSenario.TRE;
  */
 public class TREStarter {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchMethodException {
 
         Scenario scenario = Scenario.currentScenario;
 

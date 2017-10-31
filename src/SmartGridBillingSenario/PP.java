@@ -31,7 +31,6 @@ public class PP extends SocketClient {
     private Scenario scenario;
 
     //Quote for TRE TPM
-    //private String quote = "AHv/VENHgBgAIgALMpmLnQLsp8pN1U2PmypMQb9E";
 
     //authentication for PP
     private String userName = "pp";
@@ -77,7 +76,7 @@ public class PP extends SocketClient {
         }
     }
 
-    private String setEncryptQueryAndGetPrice(String query) throws NoSuchAlgorithmException, IOException, ClassNotFoundException {
+    private String setEncryptQueryAndGetPrice(String query) throws NoSuchAlgorithmException, IOException, ClassNotFoundException, NoSuchMethodException {
 
         if (StringUtils.isNotEmpty(query)) {
             String encryptedQuery = Utils.encrypt(query, publicInfo);
@@ -88,8 +87,9 @@ public class PP extends SocketClient {
             QuoteAndRateResponseMessage quoteAndRateResponseMessage = new QuoteAndRateResponseMessage(String.valueOf(result.get("quote")), Integer.valueOf(String.valueOf(result.get("rateValue"))));
             String receivedQuote = quoteAndRateResponseMessage.getQuote();
 
-            byte[] quoteByte = Utils.getByteArrayOfClass(Calculator.class);
-            String quote = Base64.encodeBase64String(Utils.shaHashing(quoteByte, new byte[]{0}));
+            byte[] quoteByte = Utils.getMethodQuoteCode(Calculator.class, "initMemberRateProcessor");
+            byte[] newByte = Utils.getMethodQuoteCode(Calculator.class, "initMemberRateMap");
+            String quote = Base64.encodeBase64String(Utils.shaHashing(quoteByte, newByte));
 
             if (receivedQuote.equals(quote)) {
                 log.info("Great!! Rate Value for user: {} is {}", query, quoteAndRateResponseMessage.getRateValue());
@@ -103,7 +103,7 @@ public class PP extends SocketClient {
         }
     }
 
-    public String smartGridBillWorkFlow() {
+    public String smartGridBillWorkFlow() throws NoSuchMethodException {
         try {
             String token = "";
             if (!scenario.equals(Scenario.fakePPScenario)) {

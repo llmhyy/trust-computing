@@ -2,8 +2,6 @@ package tss.tpm;
 
 import tss.*;
 
-import java.security.NoSuchAlgorithmException;
-
 
 // -----------This is an auto-generated file: do not edit
 
@@ -88,7 +86,7 @@ public class QuoteResponse extends TpmStructure {
         return;
     }
 
-    public byte[] toQuote() throws NoSuchAlgorithmException {
+    public byte[] toQuote() throws Exception {
         OutByteBuf buf = new OutByteBuf();
         toTpm(buf);
         return buf.getQuote();
