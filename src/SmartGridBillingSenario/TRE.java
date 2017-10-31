@@ -50,6 +50,8 @@ public class TRE extends SocketServer {
 
     private PpAuthentication ppAuthentication;
 
+    private String realSealValue = "AAAAGAAAAAEABAMEAAAAAAABABQ=";
+
     public TRE(int serverPort, Scenario scenario) throws NoSuchMethodException {
         super(serverPort);
         this.scenario = scenario;
@@ -85,7 +87,16 @@ public class TRE extends SocketServer {
                 log.info("response with Token");
                 String user = String.valueOf(message.getObject());
                 String token = ppAuthentication.assignNewTokenForUser(user);
-                return new Message(RESPONSE_FROM_GET_TOKEN, token);
+
+                String seal = Base64.encodeBase64String(Arrays.copyOf(sealForTre2(), 20));
+
+                if (seal.equals(realSealValue)) {
+                    return new Message(RESPONSE_FROM_GET_TOKEN, token);
+                } else {
+                    log.error("Wrong Seal, should stop whole process");
+                    return new Message(RESPONSE_FROM_GET_TOKEN, "");
+                }
+
             //Login with PassWord And Token
             case ATTESTATION_REQUEST:
                 log.info("response with Encrypted Key");
@@ -139,6 +150,11 @@ public class TRE extends SocketServer {
         signNewData(codeArray2);
     }
 
+    private byte[] sealForTre2() {
+        PCR_ReadResponse pcrAtStart = tpm.PCR_Read(TPMS_PCR_SELECTION.CreateSelectionArray(TPM_ALG_ID.SHA1, 2));
+        return pcrAtStart.toTpm();
+    }
+
     private void initQuote() {
 
         // Note that we create the quoting key in the endorsement hierarchy so
@@ -159,7 +175,6 @@ public class TRE extends SocketServer {
 
         System.out.println("RSA Primary quoting Key: \n" + quotingKey.toString());
 
-        // Set some PCR to non-zero values
         tpm.PCR_Event(TPM_HANDLE.pcr(0), new byte[]{0});
 
         pcrToQuote = new TPMS_PCR_SELECTION[]{
