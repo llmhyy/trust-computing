@@ -32,6 +32,9 @@ public class SocketClient {
         try {
             client = new Socket(serverHost, serverPort);
             clientPort = client.getLocalPort();
+            
+            log.info("port for client: {}", clientPort);
+            
             OutputStream outToServer = client.getOutputStream();
 
             out = new ObjectOutputStream(outToServer);
@@ -44,7 +47,8 @@ public class SocketClient {
     }
 
     public Message sendToPort(String message) throws IOException{
-        OutputStreamWriter osw;
+        @SuppressWarnings("unused")
+		OutputStreamWriter osw;
         try {
             log.info("Connecting to " + serverHost + " on port " + serverPort);
             out.writeObject(message);

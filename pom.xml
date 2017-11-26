@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>trust-computing</groupId>
-    <artifactId>trus-computing</artifactId>
+    <artifactId>trust-computing</artifactId>
     <version>1.0-SNAPSHOT</version>
     <description>A TPM 2.0 access library written in Java</description>
     <packaging>jar</packaging>
@@ -12,10 +12,12 @@
         <slf4j.version>1.6.4</slf4j.version>
         <logback.version>1.0.1</logback.version>
     </properties>
+    <!-- 
     <repository>
         <id>clojars.org</id>
         <url>http://clojars.org/repo</url>
     </repository>
+     -->
     <dependencies>
         <dependency>
             <groupId>org.bouncycastle</groupId>

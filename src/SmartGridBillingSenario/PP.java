@@ -43,14 +43,14 @@ public class PP extends SocketClient {
         this.scenario = scenario;
 
 
-        ppServerThread = new Thread() {
-            public void run() {
-                SocketServer ppSocketServer = new PpSocketServer(clientPort);
-                ppSocketServer.runServer();
-            }
-        };
+//        ppServerThread = new Thread() {
+//            public void run() {
+//                SocketServer ppSocketServer = new PpSocketServer(clientPort);
+//                ppSocketServer.runServer();
+//            }
+//        };
 
-        ppServerThread.start();
+//        ppServerThread.start();
     }
 
     private boolean getPublicKey(String token) throws IOException {
@@ -63,7 +63,7 @@ public class PP extends SocketClient {
         long startTime = System.currentTimeMillis();
         Message responseForPublicKey = sendToPort(jsonInString);
         long elapsed = System.currentTimeMillis() - startTime;
-        if (elapsed >= 1000) {
+        if (elapsed >= 10000000) {
             log.info("Face DDOS attack. connection timeout, close connection");
             return false;
         }
