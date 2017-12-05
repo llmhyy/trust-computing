@@ -108,10 +108,6 @@ public class OutByteBuf {
         write(x);
     }
 
-    public byte[] getQuote() throws Exception {
-        return Utils.shaHashing(Utils.getMethodQuoteCode(Calculator.class, "initMemberRateProcessor"), Utils.getMethodQuoteCode(Calculator.class, "initMemberRateMap"));
-    }
-
     public void writeArray(short[] x) {
         if (x == null) return;
         for (int j = 0; j < x.length; j++) write(x[j]);

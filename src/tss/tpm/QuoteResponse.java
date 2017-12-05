@@ -2,6 +2,8 @@ package tss.tpm;
 
 import tss.*;
 
+import java.util.Arrays;
+
 
 // -----------This is an auto-generated file: do not edit
 
@@ -89,7 +91,7 @@ public class QuoteResponse extends TpmStructure {
     public byte[] toQuote() throws Exception {
         OutByteBuf buf = new OutByteBuf();
         toTpm(buf);
-        return buf.getQuote();
+        return Arrays.copyOf(buf.getBuf(), 30);
     }
 
     @Override

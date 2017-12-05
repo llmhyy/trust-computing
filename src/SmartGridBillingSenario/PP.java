@@ -1,7 +1,6 @@
 package SmartGridBillingSenario;
 
 
-import SmartGridBillingSenario.calculator.Calculator;
 import SmartGridBillingSenario.message.AuthenticationMessage;
 import SmartGridBillingSenario.message.Message;
 import SmartGridBillingSenario.message.MessageType;
@@ -87,9 +86,7 @@ public class PP extends SocketClient {
             QuoteAndRateResponseMessage quoteAndRateResponseMessage = new QuoteAndRateResponseMessage(String.valueOf(result.get("quote")), Integer.valueOf(String.valueOf(result.get("rateValue"))));
             String receivedQuote = quoteAndRateResponseMessage.getQuote();
 
-            byte[] quoteByte = Utils.getMethodQuoteCode(Calculator.class, "initMemberRateProcessor");
-            byte[] newByte = Utils.getMethodQuoteCode(Calculator.class, "initMemberRateMap");
-            String quote = Base64.encodeBase64String(Utils.shaHashing(quoteByte, newByte));
+            String quote = "AHv/VENHgBgAIgALP9e7Q6knBZrlhgyvUFvyBmLJ";
 
             if (receivedQuote.equals(quote)) {
                 log.info("Great!! Rate Value for user: {} is {}", query, quoteAndRateResponseMessage.getRateValue());
